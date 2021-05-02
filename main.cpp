@@ -193,6 +193,7 @@ Sprite goodGuy(5, 31,rHeight, reflector, false, false);
 Sprite bouncyBall(63,31,rHeight, ball, true, false);
 Sprite enemyReflector(122-6,31,bHeight, reflector, false, true);
 Sprite bouncyBalls[3];
+powerups p(goodGuy, enemyReflector, bouncyBall, &reverseMode, &noCollisionsMode);
 
 void Draw(Sprite &p){ 
     bool drawLeaderboard = true;
@@ -457,6 +458,7 @@ void Sprite::nextRound(){
 	} else if (enemyReflector.round == '4'){
 			reset();
 			reverseMode = true;
+		  p.powerUp();
 			for (int i = 0; i < 2; i++){
 				bouncyBalls[i].life = alive; //spawn 2 balls
 				bouncyBalls[i].x = (Random() % 20) + 50;
@@ -648,5 +650,10 @@ void powerups::activatePower() {
 		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
 		
 	}
+}
+
+void powerups::powerUp () {
+	powerUpReady = true;
+	GPIO_PORTA_DATA_R ^= 0x10; //LED ON
 }
 

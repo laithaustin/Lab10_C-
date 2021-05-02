@@ -22,6 +22,7 @@ class powerups{
   powerups(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode);
 	int randomizer(); //returns a randomized val between 0-99
 	int hash(int val); //returns an index based on randomized value
+	void powerUp();
 	
 };
 

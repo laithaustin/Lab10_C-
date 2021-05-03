@@ -56,7 +56,7 @@
 #include "Timer2.h"
 #include "Sprite.h"
 #include "powerups.h"
-#include "sound.h"
+#include "Sound.h"
 
 //********************************************************************************
 // debuging profile, pick up to 7 unused bits and send to Logic Analyzer
@@ -129,12 +129,12 @@ bool English = true;
 bool noCollisionsMode = false;
 
 
-Sprite lasers[25];
 Sprite goodGuy(5, 31,REFLECTORH, reflector, false, false);
 Sprite bouncyBall(63,31,REFLECTORH, ball, true, false);
 Sprite enemyReflector(122-6,31,BALLH, reflector, false, true);
 Sprite bouncyBalls[3];
 powerups pUps(goodGuy, enemyReflector, bouncyBall, &reverseMode, &noCollisionsMode);
+Sprite lasers[25];
 
 void GPIOF_Handler() {
 		DisableInterrupts();
@@ -171,10 +171,12 @@ int numLasers = 0;
 void Draw(Sprite &p){
 	bool drawLeaderboard = true;
 	SSD1306_ClearBuffer();
-	if(p.round == '5' || p.round == '9') {
+	if(p.round == '5' || p.round == '7' || p.round == '9') {
 		for (int i = 0; i < numLasers; i++) {
-			if (lasers[i].life == alive) SSD1306_DrawBMP(lasers[i].x, lasers[i].y, Laser0, 0, SSD1306_WHITE);
-			if (lasers[i].y >= 2 && lasers[i].y <= 14) drawLeaderboard = false;
+			if (lasers[i].life == alive) {
+				SSD1306_DrawBMP(lasers[i].x, lasers[i].y, Laser0, 0, SSD1306_WHITE);
+				if (lasers[i].y >= 2 && lasers[i].y <= 14) drawLeaderboard = false;
+			}
 		}
 	}
 	SSD1306_DrawBMP(p.x, p.y, p.image, 0, SSD1306_WHITE);
@@ -190,7 +192,8 @@ void Draw(Sprite &p){
 		SSD1306_DrawBMP(23,12,PongLeaderboard,0,SSD1306_WHITE);
 		if(English) SSD1306_DrawString(31,3,"ROUND",SSD1306_WHITE);
 		else SSD1306_DrawString(31,3,"NIVEL",SSD1306_WHITE);
-		SSD1306_DrawChar(64,3,p.round,SSD1306_WHITE);
+		if (p.round < ':') SSD1306_DrawChar(64,3,p.round,SSD1306_WHITE);
+		else if (p.round == ':') SSD1306_DrawString(64,3,"10",SSD1306_WHITE);
 		SSD1306_DrawChar(79,3,p.score,SSD1306_WHITE);
 		SSD1306_DrawChar(85,3,'v',SSD1306_WHITE);
 		SSD1306_DrawChar(91,3,enemyReflector.score,SSD1306_WHITE);
@@ -335,7 +338,6 @@ void introAnimation(void) {
 
 
 int main(void){
-	uint32_t time=0;
   DisableInterrupts();
   // pick one of the following three lines, all three set to 80 MHz
   //PLL_Init();                   // 1) call to have no TExaS debugging
@@ -361,7 +363,6 @@ int main(void){
 		SSD1306_DrawString(46,34,"Ingles",SSD1306_WHITE);
 	}
 	SSD1306_OutBuffer();
-	bool DrawPointer = false;
 	goToMenu(); //menu time
 	bouncyBall.score = goodGuy.score+enemyReflector.score;
 	while(goodGuy.life == alive){
@@ -371,7 +372,7 @@ int main(void){
   }
 	SSD1306_OutClear();
 	SSD1306_ClearBuffer();
-  SSD1306_DrawBMP(2, 62, PongScreen4, 0, SSD1306_INVERSE);
+	SSD1306_DrawBMP(14, 27, PongScreen4, 0, SSD1306_WHITE);
   SSD1306_OutBuffer();
 }
 
@@ -387,6 +388,7 @@ void Delay100ms(uint32_t count){
 	delayCounter = 0;
 	Timer1_Init(delay,8000000);
   while (delayCounter < count) {}
+	TIMER1_CTL_R = 0;
 }
 
 
@@ -429,6 +431,24 @@ void PeriodicLaserHandler() {
 	lasers[0].life = alive;
 	Sound_Start(shoot,4080);
 }
+
+uint32_t parse = 0;
+
+void PeriodicBulletHellHandler() {
+	int randomY = Random() %64;
+	while (randomY <= enemyReflector.y + 2 && randomY > enemyReflector.y - REFLECTORH - 2) {
+		randomY = Random()%64;
+	}
+	lasers[parse%numLasers].x = enemyReflector.x - 6;
+	lasers[parse%numLasers].y = randomY;
+	lasers[parse%numLasers].vx = -10;
+	lasers[parse%numLasers].isEnemy = true;
+	lasers[parse%numLasers].isProjectile = true;
+	lasers[parse%numLasers].length = 2;
+	lasers[parse%numLasers].life = alive;
+	parse++;
+	Sound_Start(shoot,4080);
+}
 //------------------------------implement functions of sprite below-----------------------------------------------
 
 //reset conditions
@@ -444,6 +464,11 @@ void Sprite::reset() {
 				bouncyBalls[i].x = (Random() % 20) + 50;
 				bouncyBalls[i].y = (Random() % 60);
 				bouncyBalls[i].vy = (Random() % 5);
+		}
+		for (int i = 0; i < numLasers; i++) {
+				lasers[i].life = dead;
+				lasers[i].x = 61;
+				lasers[i].y = 31;
 		}
 }
 
@@ -491,6 +516,23 @@ void Sprite::nextRound(){
 	} else if (enemyReflector.round == '6') {
 			reset();
 			TIMER0_CTL_R = 0x00000000;    // 1) disable TIMER0A (laser)
+		//TODO: Write rest of round 6 conditions, reset conditions, and point scored conditions
+	} else if (enemyReflector.round == '7') {
+			reset();
+		//TODO: Write rest of round 7 conditions, reset conditions, and point scored conditions
+	} else if (enemyReflector.round == '8') {
+			reset();
+		//TODO: Write rest of round 8 conditions, reset conditions, and point scored conditions
+	} else if (enemyReflector.round == '9') {
+			reset();
+			numLasers = 15;
+			Timer0_Init(PeriodicBulletHellHandler,80000*50*4);
+	} else if (enemyReflector.round == ':') {
+			reset();
+		//TODO: Write rest of round 10 conditions, reset conditions, and point scored conditions (FINAL BOSS)
+	} else if (enemyReflector.round == ';') {
+		goodGuy.life = dead;
+		bouncyBall.score++;
 	}
 }
 
@@ -498,13 +540,13 @@ void Sprite::nextRound(){
 void Sprite::PointScored(int who) {
     if (who == 0) enemyReflector.score++;
     else if (who == 1) goodGuy.score++;
-    if (goodGuy.score == '3' ||enemyReflector.score == '3' ){
+    if (goodGuy.score == '5' ||enemyReflector.score == '5' ){
 			nextRound();
-		} else if (enemyReflector.score == '3'){
+		} else if (enemyReflector.score == '5'){
 			//implement losing mechanic/screen
 			goodGuy.life = dead;
 		}
-		if (goodGuy.round != '4' && goodGuy.round != '5'){
+		if (goodGuy.round != '4' && goodGuy.round != '5' && goodGuy.round != '9'){
 			bouncyBall.x = 63;
 			bouncyBall.y = 31;
 			bouncyBall.vy = 0;
@@ -526,6 +568,20 @@ void Sprite::PointScored(int who) {
 		}
 		else if (goodGuy.round == '5') {
 			//TODO: write reset requirements
+			lasers[0].life = dead;
+			bouncyBall.x = 63;
+			bouncyBall.y = 31;
+			bouncyBall.vy = 0;
+			bouncyBall.vx = 0;
+			bouncyBall.life = alive;
+			bouncyBall.vx = -6;
+		}
+		else if (goodGuy.round == '9') {
+			for (int i = 0; i < numLasers; i++) {
+				lasers[i].life = dead;
+				lasers[i].x = 61;
+				lasers[i].y = -1;
+			}
 			bouncyBall.x = 63;
 			bouncyBall.y = 31;
 			bouncyBall.vy = 0;
@@ -646,7 +702,8 @@ void Sprite::logic() {
 					y = 63;
 				}
 			}
-		}
+		} 
+		if (enemyReflector.y < REFLECTORH) enemyReflector.y = REFLECTORH;
 }
 
 	//laser move conditions
@@ -654,11 +711,11 @@ void Sprite::moveLaser() {
 	if (life == alive && isProjectile && isEnemy) {
 		x -= 10;
 		needToDraw = true;
-		if (x <= 1) {
+		if (x <= -5) {
 			life = dead;
 		}
 	}
-	if ((x <= goodGuy.x + REFLECTORW) && (y <= goodGuy.y) && (y > goodGuy.y - REFLECTORH)){
+	if ((x <= goodGuy.x + REFLECTORW) && (y <= goodGuy.y) && (y > goodGuy.y - REFLECTORH) && life == alive){
 		needToDraw = false;
 		enemyReflector.PointScored(0);
 	}

@@ -83,84 +83,32 @@ void ScopeTask(void){  // called 10k/sec
 }*/
 void Profile_Init(void){
   SYSCTL_RCGCGPIO_R |= 0x21;      // activate port A,F
-  while((SYSCTL_PRGPIO_R&0x20) != 0x20){}
+  while((SYSCTL_RCGCGPIO_R&0x21) != 0x21){}
   GPIO_PORTF_DIR_R |=  0x0E;   // output on PF3,2,1 
-    GPIO_PORTF_DIR_R &= ~0x10;   // input on PF4
-    GPIO_PORTF_AFSEL_R &= ~0x10; // disable alt funct
+  GPIO_PORTF_DIR_R &= ~0x10;   // input on PF4
+  GPIO_PORTF_AFSEL_R &= ~0x10; // disable alt funct
   GPIO_PORTF_DEN_R |=  0x1E;   // enable digital I/O on PF4,3,2,1
-    GPIO_PORTF_PCTL_R &= ~0x000F0000;
-    GPIO_PORTF_AMSEL_R &= ~0x10; // disable analog funct
-    GPIO_PORTF_PUR_R |=     0x10;     // PUR on PF4
-    GPIO_PORTF_IS_R &= ~0x10;      //PF0 not edge-sensitive
-    GPIO_PORTF_IBE_R &= ~0x10;      //PF0 not both edges
-    GPIO_PORTF_IEV_R &= ~0x10;      //PF0 falling edge event
-    GPIO_PORTF_ICR_R = 0x10;          //clear flag4
-    GPIO_PORTF_IM_R |= 0x10;         //arm interrupt on PF4
-    NVIC_PRI7_R = (NVIC_PRI7_R&0xFF00FFFF)|0x00A00000; //priority 5
-    NVIC_EN0_R = 0x40000000;          // enable interrupt 30 in NVIC
+  GPIO_PORTF_PCTL_R &= ~0x000F0000;
+  GPIO_PORTF_AMSEL_R &= ~0x10; // disable analog funct
+  GPIO_PORTF_PUR_R |=     0x10;     // PUR on PF4
+  GPIO_PORTF_IS_R &= ~0x10;      //PF0 not edge-sensitive
+  GPIO_PORTF_IBE_R &= ~0x10;      //PF0 not both edges
+  GPIO_PORTF_IEV_R &= ~0x10;      //PF0 falling edge event
+  GPIO_PORTF_ICR_R = 0x10;          //clear flag4
+  GPIO_PORTF_IM_R |= 0x10;         //arm interrupt on PF4
+  NVIC_PRI7_R = (NVIC_PRI7_R&0xFF00FFFF)|0x00A00000; //priority 5
+  NVIC_EN0_R = 0x40000000;          // enable interrupt 30 in NVIC
   GPIO_PORTA_DIR_R &=  ~0xC;   // input on PA2 PA3
   GPIO_PORTA_DEN_R |=  0xC;   // enable on PA2 PA3
-	GPIO_PORTA_DEN_R |= 0x10; //enable on PA4
-	GPIO_PORTA_DIR_R |= 0x10; //output on PA4
 }
 
-void GPIOPortF_Handler(void) {
-    GPIO_PORTF_ICR_R = 0x10;
-}
 //********************************************************************************
  
-
+extern "C" void GPIOF_Handler(void);
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
 extern "C" void SysTick_Handler(void);
 void Delay100ms(uint32_t count); // time delay in 0.1 seconds
-
-int main2(void){
-	uint32_t time=0;
-  DisableInterrupts();
-  // pick one of the following three lines, all three set to 80 MHz
-  //PLL_Init();                   // 1) call to have no TExaS debugging
-  TExaS_Init(&LogicAnalyzerTask); // 2) call to activate logic analyzer
-  //TExaS_Init(&ScopeTask);       // or 3) call to activate analog scope PD2
-  SSD1306_Init(SSD1306_SWITCHCAPVCC);
-  SSD1306_OutClear();   
-  Random_Init(1);
-  Profile_Init(); // PB5,PB4,PF3,PF2,PF1 
-  SSD1306_ClearBuffer();
-  SSD1306_DrawBMP(2, 62, PongScreen1, 0, SSD1306_WHITE);
-  SSD1306_OutBuffer();
-  EnableInterrupts();
-  Delay100ms(20);
-  SSD1306_ClearBuffer();
-  SSD1306_DrawBMP(47, 63, PlayerShip0, 0, SSD1306_WHITE); // player ship bottom
-  SSD1306_DrawBMP(53, 55, Bunker0, 0, SSD1306_WHITE);
-
-  SSD1306_DrawBMP(0, 9, Alien10pointA, 0, SSD1306_WHITE);
-  SSD1306_DrawBMP(20,9, Alien10pointB, 0, SSD1306_WHITE);
-  SSD1306_DrawBMP(40, 9, Alien20pointA, 0, SSD1306_WHITE);
-  SSD1306_DrawBMP(60, 9, Alien20pointB, 0, SSD1306_WHITE);
-  SSD1306_DrawBMP(80, 9, Alien30pointA, 0, SSD1306_WHITE);
-  SSD1306_DrawBMP(50, 19, AlienBossA, 0, SSD1306_WHITE);
-  SSD1306_OutBuffer();
-  Delay100ms(30);
-	
-  SSD1306_OutClear();  
-  SSD1306_SetCursor(1, 1);
-  SSD1306_OutString((char *)"GAME OVER");
-  SSD1306_SetCursor(1, 2);
-  SSD1306_OutString((char *)"Nice try,");
-  SSD1306_SetCursor(1, 3);
-  SSD1306_OutString((char *)"Earthling!");
-  SSD1306_SetCursor(2, 4);
-  while(1){
-    Delay100ms(10);
-    SSD1306_SetCursor(19,0);
-    SSD1306_OutUDec2(time);
-    time++;
-    PF1 ^= 0x02;
-  }
-}
-
 
 #define REFLECTORW 4
 #define REFLECTORH 14
@@ -171,11 +119,17 @@ int main2(void){
 #define PRECISION 4096
 #define BALLS 3
 
-bool noCollisionsMode = false; //dictates the nonsensical ability to turn off physics
 bool reverseMode = false; //dictates the annoyingness of the game
 bool English = true;
 
-#include "powerups.h"
+void GPIOF_Handler() {
+		DisableInterrupts();
+		while ((GPIO_PORTF_DATA_R&0x10) == 0x0) {}
+		while ((GPIO_PORTF_DATA_R&0x10) == 0x10) {}
+		while ((GPIO_PORTF_DATA_R&0x10) == 0x0) {}
+		EnableInterrupts();
+    GPIO_PORTF_ICR_R = 0x10;
+}
 
 void SysTick_Init(unsigned long period){
 	NVIC_ST_CTRL_R = 0;
@@ -189,34 +143,47 @@ void SysTick_Init(unsigned long period){
   NVIC_ST_CTRL_R = 7; //COUNTER, INTERRUPTS, CLOCK
 }
 
-Sprite goodGuy(5, 31,rHeight, reflector, false, false);
-Sprite bouncyBall(63,31,rHeight, ball, true, false);
-Sprite enemyReflector(122-6,31,bHeight, reflector, false, true);
+Sprite lasers[25];
+Sprite goodGuy(5, 31,REFLECTORH, reflector, false, false);
+Sprite bouncyBall(63,31,REFLECTORH, ball, true, false);
+Sprite enemyReflector(122-6,31,BALLH, reflector, false, true);
 Sprite bouncyBalls[3];
 
-void Draw(Sprite &p){ 
-    bool drawLeaderboard = true;
-    SSD1306_ClearBuffer();
-    SSD1306_DrawBMP(p.x, p.y, p.image, 0, SSD1306_WHITE);
-    if(bouncyBall.life == alive) SSD1306_DrawBMP(bouncyBall.x, bouncyBall.y, bouncyBall.image, 0, SSD1306_WHITE);
-    SSD1306_DrawBMP(enemyReflector.x, enemyReflector.y, enemyReflector.image, 0, SSD1306_WHITE);
-    for (int i = 0; i < BALLS; i++){
-        if (bouncyBalls[i].life == alive){
-            SSD1306_DrawBMP(bouncyBalls[i].x, bouncyBalls[i].y, bouncyBalls[i].image, 0, SSD1306_WHITE);
-            if (bouncyBalls[i].y >= 4 && bouncyBalls[i].y <= 16) drawLeaderboard = false;
-        }
-    }
-    if (!(bouncyBall.y >= 4 && bouncyBall.y <= 16) && drawLeaderboard) {
-        SSD1306_DrawBMP(23,12,PongLeaderboard,0,SSD1306_WHITE);
-        if(English) SSD1306_DrawString(31,3,"ROUND",SSD1306_WHITE);
-        else SSD1306_DrawString(31,3,"NIVEL",SSD1306_WHITE);
-        SSD1306_DrawChar(64,3,p.round,SSD1306_WHITE);
-        SSD1306_DrawChar(79,3,p.score,SSD1306_WHITE);
-        SSD1306_DrawChar(85,3,'v',SSD1306_WHITE);
-        SSD1306_DrawChar(91,3,enemyReflector.score,SSD1306_WHITE);
-    }
-    SSD1306_OutBuffer();  // takes 25ms
-    p.needToDraw = false;       // semaphore
+int numLasers = 0;
+
+void Draw(Sprite &p){
+	bool drawLeaderboard = true;
+	SSD1306_ClearBuffer();
+	if(p.round == '5' || p.round == '9') {
+		for (int i = 0; i < numLasers; i++) {
+			if (lasers[i].life == alive) SSD1306_DrawBMP(lasers[i].x, lasers[i].y, Laser0, 0, SSD1306_WHITE);
+			if (lasers[i].y >= 2 && lasers[i].y <= 14) drawLeaderboard = false;
+		}
+	}
+	SSD1306_DrawBMP(p.x, p.y, p.image, 0, SSD1306_WHITE);
+	if(bouncyBall.life == alive) SSD1306_DrawBMP(bouncyBall.x, bouncyBall.y, bouncyBall.image, 0, SSD1306_WHITE);
+	SSD1306_DrawBMP(enemyReflector.x, enemyReflector.y, enemyReflector.image, 0, SSD1306_WHITE);
+	for (int i = 0; i < BALLS; i++){
+		if (bouncyBalls[i].life == alive){
+			SSD1306_DrawBMP(bouncyBalls[i].x, bouncyBalls[i].y, bouncyBalls[i].image, 0, SSD1306_WHITE);
+			if (bouncyBalls[i].y >= 4 && bouncyBalls[i].y <= 16) drawLeaderboard = false;
+		}
+	}
+	if (!(bouncyBall.y >= 4 && bouncyBall.y <= 16 && bouncyBall.life == alive) && drawLeaderboard) {
+		SSD1306_DrawBMP(23,12,PongLeaderboard,0,SSD1306_WHITE);
+		if(English) SSD1306_DrawString(31,3,"ROUND",SSD1306_WHITE);
+		else SSD1306_DrawString(31,3,"NIVEL",SSD1306_WHITE);
+		SSD1306_DrawChar(64,3,p.round,SSD1306_WHITE);
+		SSD1306_DrawChar(79,3,p.score,SSD1306_WHITE);
+		SSD1306_DrawChar(85,3,'v',SSD1306_WHITE);
+		SSD1306_DrawChar(91,3,enemyReflector.score,SSD1306_WHITE);
+	}
+	SSD1306_OutBuffer();  // takes 25ms
+	if (goodGuy.score+enemyReflector.score >= bouncyBall.score) {
+		Delay100ms(5);
+		bouncyBall.score++;
+	}
+	p.needToDraw = false;       // semaphore
 }
 
 int menuPointer = 0;
@@ -268,7 +235,7 @@ void goToMenu(void) {
 				else {
 					SSD1306_DrawString(49,14,"Tocar",SSD1306_WHITE);
 					SSD1306_DrawString(25,24,"Instrucciones",SSD1306_WHITE);
-					SSD1306_DrawString(46,34,"Inglés",SSD1306_WHITE);
+					SSD1306_DrawString(46,34,"Ingles",SSD1306_WHITE);
 				}
 				SSD1306_OutBuffer();
 				while((GPIO_PORTA_DATA_R&0x4) == 0x0) {}
@@ -297,7 +264,7 @@ void goToMenu(void) {
 				else {
 					SSD1306_DrawString(49,14,"Tocar",SSD1306_WHITE);
 					SSD1306_DrawString(25,24,"Instrucciones",SSD1306_WHITE);
-					SSD1306_DrawString(46,34,"Inglés",SSD1306_WHITE);
+					SSD1306_DrawString(46,34,"Ingles",SSD1306_WHITE);
 				}
 				SSD1306_OutBuffer();
 				while((GPIO_PORTA_DATA_R&0x4) == 0x0) {}
@@ -350,8 +317,6 @@ void introAnimation(void) {
 }
 
 
-
-
 int main(void){
 	uint32_t time=0;
   DisableInterrupts();
@@ -374,12 +339,13 @@ int main(void){
 	else {
 		SSD1306_DrawString(49,14,"Tocar",SSD1306_WHITE);
 		SSD1306_DrawString(25,24,"Instrucciones",SSD1306_WHITE);
-		SSD1306_DrawString(46,34,"Inglés",SSD1306_WHITE);
+		SSD1306_DrawString(46,34,"Ingles",SSD1306_WHITE);
 	}
 	SSD1306_OutBuffer();
 	bool DrawPointer = false;
   EnableInterrupts();
 	goToMenu(); //menu time
+	bouncyBall.score = goodGuy.score+enemyReflector.score;
 	while(goodGuy.life == alive){
     if (goodGuy.needToDraw){
 			Draw(goodGuy);
@@ -387,8 +353,8 @@ int main(void){
   }
 	SSD1306_OutClear();
 	SSD1306_ClearBuffer();
-  SSD1306_DrawBMP(2, 62, PongScreen1, 0, SSD1306_INVERSE);
-  SSD1306_OutBuffer();	
+  SSD1306_DrawBMP(2, 62, PongScreen4, 0, SSD1306_INVERSE);
+  SSD1306_OutBuffer();
 }
 
 // You can't use this timer, it is here for starter code only 
@@ -409,7 +375,10 @@ void SysTick_Handler(void){
 	if (menu) {
 		menuPointer = ADC_In();
 	}
-	else {
+	else if (goodGuy.score + enemyReflector.score >= bouncyBall.score) {
+		goodGuy.needToDraw = true;
+	}
+	else if (!menu) {
 		uint32_t data = (reverseMode) ? (PRECISION - ADC_In()) : ADC_In();
 		goodGuy.move(data);
 		if (bouncyBall.life == alive) bouncyBall.move(0);
@@ -419,9 +388,26 @@ void SysTick_Handler(void){
 			bouncyBalls[i].move(0);
 			}
 		}
+		if (goodGuy.round == '5' || goodGuy.round == '9'){
+			for(int i = 0; i < numLasers; i++) {
+				if (lasers[i].life == alive) {
+					lasers[i].vx = -10;
+					lasers[i].moveLaser();
+				}
+			}
+		}
 	}
 }
 
+void PeriodicLaserHandler() {
+	lasers[0].x = enemyReflector.x - 6;
+	lasers[0].y = enemyReflector.y - REFLECTORH/2;
+	lasers[0].vx = -10;
+	lasers[0].isEnemy = true;
+	lasers[0].isProjectile = true;
+	lasers[0].length = 2;
+	lasers[0].life = alive;
+}
 //------------------------------implement functions of sprite below-----------------------------------------------
 
 //reset conditions
@@ -430,6 +416,7 @@ void Sprite::reset() {
 		enemyReflector.image = reflector;
 		enemyReflector.vy = AIYSPEED;
 		bouncyBall.ax = 0;
+		bouncyBall.vx = -3;
 		reverseMode = false;
 		for (int i = 0; i < BALLS; i++){
 				bouncyBalls[i].life = dead; //spawn 2 balls
@@ -444,6 +431,7 @@ void Sprite::reset() {
 void Sprite::nextRound(){
 	goodGuy.score = '0';
 	enemyReflector.score = '0';
+	bouncyBall.score = goodGuy.score+enemyReflector.score;
 	goodGuy.round++; //dictates the stage of the game we are in
 	enemyReflector.round++;
 	if (enemyReflector.round == '2'){
@@ -469,6 +457,15 @@ void Sprite::nextRound(){
 			}
 			enemyReflector.vy += 2;
 			bouncyBall.life = dead; //main ball is out
+	} else if (enemyReflector.round == '5') {
+			reset();
+			for (int i = 0; i < BALLS; i++){
+				bouncyBalls[i].life = dead;
+			}
+			enemyReflector.vy += 2;
+			numLasers = 1;
+			Timer0_Init(PeriodicLaserHandler,80000*50*35);
+	} else if (enemyReflector.round == '6') {
 	}
 }
 
@@ -482,7 +479,7 @@ void Sprite::PointScored(int who) {
 			//implement losing mechanic/screen
 			goodGuy.life = dead;
 		}
-		if (goodGuy.round != '4'){
+		if (goodGuy.round != '4' && goodGuy.round != '5'){
 			bouncyBall.x = 63;
 			bouncyBall.y = 31;
 			bouncyBall.vy = 0;
@@ -490,7 +487,7 @@ void Sprite::PointScored(int who) {
 			bouncyBall.life = alive;
 			bouncyBall.vx = -6;
 		}
-		else {
+		else if (goodGuy.round == '4') {
 			for (int i = 0; i < 2; i++){
 				bouncyBalls[i].life = alive; //spawn 2 balls
 				bouncyBalls[i].x = (Random() % 20) + 50;
@@ -501,6 +498,15 @@ void Sprite::PointScored(int who) {
 					bouncyBalls[i].vx *= -1;
 				}
 				} //spawn 2 balls
+		}
+		else if (goodGuy.round == '5') {
+			//TODO: write reset requirements
+			bouncyBall.x = 63;
+			bouncyBall.y = 31;
+			bouncyBall.vy = 0;
+			bouncyBall.vx = 0;
+			bouncyBall.life = alive;
+			bouncyBall.vx = -3;
 		}
 }
 
@@ -518,10 +524,10 @@ int abs(int x){
 bool Sprite::collision(Sprite first, Sprite second){
 	int f_centerX = first.x + BALLH/2;
 	int s_centerX = second.x + BALLH/2;
-	int f_centerY = first.y + BALLH/2;
-	int s_centerY = second.y + BALLH/2;
+	int f_centerY = first.y + first.length/2;
+	int s_centerY = second.y + second.length/2;
 	
-	if (absDiff(f_centerX,s_centerX) <= BALLH && absDiff(f_centerY, s_centerY) <= BALLH){
+	if (absDiff(f_centerX,s_centerX) <= first.length && absDiff(f_centerY, s_centerY) <= BALLH){
 		return true;
 	}
 	return false;
@@ -581,7 +587,7 @@ void Sprite::physics() {
 Sprite *findClosestBall(int balls){
 	Sprite *p = &bouncyBalls[0];
 	for (int i = 1; i < balls; i++){
-		if (bouncyBalls[i].x < p->x){
+		if (bouncyBalls[i].x > p->x){
 			p = &bouncyBalls[i]; 
 		}
 	}
@@ -618,6 +624,21 @@ void Sprite::logic() {
 		}
 }
 
+	//laser move conditions
+void Sprite::moveLaser() {
+	if (life == alive && isProjectile && isEnemy) {
+		x -= 10;
+		needToDraw = true;
+		if (x <= 1) {
+			life = dead;
+		}
+	}
+	if ((x <= goodGuy.x + REFLECTORW) && (y <= goodGuy.y) && (y > goodGuy.y - REFLECTORH)){
+		needToDraw = false;
+		enemyReflector.PointScored(0);
+	}
+}
+
 //initializer for projectiles
 Sprite::Sprite(){
 	x = 61;
@@ -631,22 +652,6 @@ Sprite::Sprite(){
 	isProjectile = true;
 	life = dead;
 	isEnemy = false;
+	for(int i = 0; i < 25; i++) if(this == &lasers[i]) isEnemy = true;
 	image = ball; //default image - change as necessary
 }
-
-
-
-//---------------------------powerup function initializations-------------
-
-int powerups::randomizer() {
-	return Random() % 100;
-}
-
-void powerups::activatePower() {
-	if (powerUpReady){
-		int index = hash(randomizer());
-		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
-		
-	}
-}
-

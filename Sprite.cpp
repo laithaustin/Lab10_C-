@@ -13,7 +13,7 @@
 
 void Sprite::move(int data) {
 		//reflector move conditions
-		if (alive && !isProjectile && data >= 0){
+		if (life == alive && !isProjectile && data >= 0){
 			lasty = y;
 			y = (data*(63+8+22))/4096; //compute y
 			//set direction
@@ -26,7 +26,7 @@ void Sprite::move(int data) {
 			needToDraw = true;
 		}
 		//ball move conditions
-		else if (alive && isProjectile) {
+		else if (life == alive && isProjectile && !isEnemy) {
 				physics();
 				x += vx;
 				y += vy;
@@ -40,17 +40,16 @@ void Sprite::move(int data) {
 					y = 62;
 					vy = -vy;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 				}
-				if (x >= 122 || x <= 1){  //death condition if ball goes out of bounds
-                    this->life = dead;
-                    int who = 0;
-                    if (x >= 122) who = 1;
-                    PointScored(who);
+				if ((x >= 122 || x <= 1) && !isEnemy){  //death condition if ball goes out of bounds
+					this->life = dead;
+					int who = 0;
+					if (x >= 122) who = 1;
+					PointScored(who);
         }
 				needToDraw = true;
 		}
-			
 		//enemy reflector conditions
-		else if (alive && data <0){
+		else if (life == alive && data <0){
 			//if (round == 1){
 			logic();
 			needToDraw = true;

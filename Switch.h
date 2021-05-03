@@ -13,7 +13,7 @@
 
 // Header files contain the prototypes for public functions 
 // this file explains what the module does
-
+void Switch_Init(void);
 
 #endif
 

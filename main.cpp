@@ -107,6 +107,7 @@ void Profile_Init(void){
 //********************************************************************************
  
 extern "C" void GPIOF_Handler(void);
+extern "C" void GPIOA_Handler(void);
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
 extern "C" void SysTick_Handler(void);
@@ -125,6 +126,14 @@ bool reverseMode = false; //dictates the annoyingness of the game
 bool English = true;
 bool noCollisionsMode = false;
 
+
+Sprite lasers[25];
+Sprite goodGuy(5, 31,REFLECTORH, reflector, false, false);
+Sprite bouncyBall(63,31,REFLECTORH, ball, true, false);
+Sprite enemyReflector(122-6,31,BALLH, reflector, false, true);
+Sprite bouncyBalls[3];
+powerups pUps(goodGuy, enemyReflector, bouncyBall, &reverseMode, &noCollisionsMode);
+
 void GPIOF_Handler() {
 		DisableInterrupts();
 		while ((GPIO_PORTF_DATA_R&0x10) == 0x0) {}
@@ -132,6 +141,14 @@ void GPIOF_Handler() {
 		while ((GPIO_PORTF_DATA_R&0x10) == 0x0) {}
 		EnableInterrupts();
     GPIO_PORTF_ICR_R = 0x10;
+}
+
+void GPIOA_Handler() {
+		DisableInterrupts();
+		pUps.activatePower();
+		GPIO_PORTA_DATA_R &= ~0x10; //clear LED
+		GPIO_PORTA_ICR_R = 0x04;
+		EnableInterrupts();
 }
 
 void SysTick_Init(unsigned long period){
@@ -146,11 +163,6 @@ void SysTick_Init(unsigned long period){
   NVIC_ST_CTRL_R = 7; //COUNTER, INTERRUPTS, CLOCK
 }
 
-Sprite lasers[25];
-Sprite goodGuy(5, 31,REFLECTORH, reflector, false, false);
-Sprite bouncyBall(63,31,REFLECTORH, ball, true, false);
-Sprite enemyReflector(122-6,31,BALLH, reflector, false, true);
-Sprite bouncyBalls[3];
 
 int numLasers = 0;
 
@@ -450,6 +462,7 @@ void Sprite::nextRound(){
 	} else if (enemyReflector.round == '4'){
 			reset();
 			reverseMode = true;
+			pUps.powerUpActivate(); //enable PA4 powerup interrupt
 			for (int i = 0; i < 2; i++){
 				bouncyBalls[i].life = alive; //spawn 2 balls
 				bouncyBalls[i].x = (Random() % 20) + 50;
@@ -464,6 +477,7 @@ void Sprite::nextRound(){
 			bouncyBall.life = dead; //main ball is out
 	} else if (enemyReflector.round == '5') {
 			reset();
+			pUps.powerUpActivate();
 			for (int i = 0; i < BALLS; i++){
 				bouncyBalls[i].life = dead;
 			}
@@ -671,7 +685,13 @@ void powerups::activatePower() {
 	if (powerUpReady){
 		int index = hash(randomizer());
 		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
-		
+		powerUpReady = false;
 	}
+}
+
+void powerups::powerUpActivate() {
+	Switch_Init();
+	powerUpReady = true;
+	GPIO_PORTA_DATA_R |= 0x10; //LED ON
 }
 

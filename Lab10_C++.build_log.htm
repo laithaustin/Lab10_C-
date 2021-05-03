@@ -27,6 +27,8 @@ Project File Date:  05/02/2021
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Rebuild target 'Lab 10'
+compiling random.cpp...
+assembling startup_TM4C123.s...
 compiling Sound.cpp...
 Sound.cpp(12): warning:  #177-D: variable "shoot"  was declared but never referenced
   const uint8_t shoot[4080] = {
@@ -45,51 +47,26 @@ Sound.cpp(991): warning:  #177-D: variable "fastinvader4"  was declared but neve
 Sound.cpp(1048): warning:  #177-D: variable "highpitch"  was declared but never referenced
   const uint8_t highpitch[1802] = {
 Sound.cpp: 8 warnings, 0 errors
-compiling random.cpp...
-assembling startup_TM4C123.s...
 compiling SSD1306.cpp...
-compiling Timer1.cpp...
 compiling DAC.cpp...
 compiling SlidePot.cpp...
-compiling I2C3.cpp...
 compiling Timer0.cpp...
+compiling Timer1.cpp...
+compiling I2C3.cpp...
 compiling main.cpp...
-main.cpp(321): warning:  #177-D: variable "time"  was declared but never referenced
+main.cpp(324): warning:  #177-D: variable "time"  was declared but never referenced
   	uint32_t time=0;
-main.cpp(345): warning:  #177-D: variable "DrawPointer"  was declared but never referenced
+main.cpp(349): warning:  #177-D: variable "DrawPointer"  was declared but never referenced
   	bool DrawPointer = false;
 main.cpp: 2 warnings, 0 errors
 compiling TExaS.cpp...
-compiling powerups.cpp...
 compiling Sprite.cpp...
-Sprite.cpp(87): error:  #276: name followed by "::" must be a class or namespace name
-  int powerups::randomizer() {
-Sprite.cpp(88): error:  #20: identifier "Random" is undefined
-  	return Random() % 100;
-Sprite.cpp(91): error:  #276: name followed by "::" must be a class or namespace name
-  void powerups::activatePower() {
-Sprite.cpp(92): error:  #20: identifier "powerUpReady" is undefined
-  	if (powerUpReady){
-Sprite.cpp(93): error:  #20: identifier "randomizer" is undefined
-  		int index = hash(randomizer());
-Sprite.cpp(93): error:  #20: identifier "hash" is undefined
-  		int index = hash(randomizer());
-Sprite.cpp(94): error:  #20: identifier "list" is undefined
-  		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
-Sprite.cpp(94): error:  #20: identifier "goodGuy" is undefined
-  		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
-Sprite.cpp(94): error:  #20: identifier "enemyReflector" is undefined
-  		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
-Sprite.cpp(94): error:  #20: identifier "bouncyBall" is undefined
-  		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
-Sprite.cpp(94): error:  #20: identifier "reverseMode" is undefined
-  		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
-Sprite.cpp(94): error:  #20: identifier "noCollisionsMode" is undefined
-  		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
-Sprite.cpp: 0 warnings, 12 errors
-compiling Switch.cpp...
 compiling Timer2.cpp...
-".\Lab10_C++.axf" - 12 Error(s), 10 Warning(s).
+compiling Switch.cpp...
+compiling powerups.cpp...
+linking...
+Program Size: Code=13750 RO-data=11398 RW-data=84 ZI-data=4780  
+".\Lab10_C++.axf" - 0 Error(s), 10 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -112,8 +89,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.4.0
-Target not created.
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

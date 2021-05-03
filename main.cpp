@@ -123,6 +123,7 @@ void Delay100ms(uint32_t count); // time delay in 0.1 seconds
 
 bool reverseMode = false; //dictates the annoyingness of the game
 bool English = true;
+bool noCollisionsMode = false;
 
 void GPIOF_Handler() {
 		DisableInterrupts();
@@ -331,6 +332,7 @@ int main(void){
 	SysTick_Init(80000*50);
   Profile_Init(); // PA3,PA2,PF3,PF2,PF1 
   Random_Init(1);
+	EnableInterrupts();
 	introAnimation();
 	SSD1306_ClearBuffer();
 	if (English) { //draw static menu
@@ -345,7 +347,6 @@ int main(void){
 	}
 	SSD1306_OutBuffer();
 	bool DrawPointer = false;
-  EnableInterrupts();
 	goToMenu(); //menu time
 	bouncyBall.score = goodGuy.score+enemyReflector.score;
 	while(goodGuy.life == alive){
@@ -361,14 +362,16 @@ int main(void){
 
 // You can't use this timer, it is here for starter code only 
 // you must use interrupts to perform delays
-void Delay100ms(uint32_t count){uint32_t volatile time;
-  while(count>0){
-    time = 727240;  // 0.1sec at 80 MHz
-    while(time){
-      time--;
-    }
-    count--;
-  }
+int delayCounter = 0;
+
+void delay() {
+	delayCounter++;
+}
+
+void Delay100ms(uint32_t count){
+	delayCounter = 0;
+	Timer1_Init(delay,8000000);
+  while (delayCounter < count) {}
 }
 
 
@@ -657,3 +660,18 @@ Sprite::Sprite(){
 	for(int i = 0; i < 25; i++) if(this == &lasers[i]) isEnemy = true;
 	image = ball; //default image - change as necessary
 }
+
+//---------------------------powerup function initializations-------------
+
+int powerups::randomizer() {
+	return Random() % 100;
+}
+
+void powerups::activatePower() {
+	if (powerUpReady){
+		int index = hash(randomizer());
+		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
+		
+	}
+}
+

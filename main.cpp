@@ -422,6 +422,7 @@ void SysTick_Handler(void){
 }
 
 void PeriodicLaserHandler() {
+	if (lasers[0].life == alive) return;
 	lasers[0].x = enemyReflector.x - 6;
 	lasers[0].y = enemyReflector.y - REFLECTORH/2;
 	lasers[0].vx = -10;
@@ -436,7 +437,7 @@ uint32_t parse = 0;
 
 void PeriodicBulletHellHandler() {
 	int randomY = Random() %64;
-	while (randomY <= enemyReflector.y + 2 && randomY > enemyReflector.y - REFLECTORH - 2) {
+	while (randomY <= enemyReflector.y + 4 && randomY > enemyReflector.y - REFLECTORH - 4) {
 		randomY = Random()%64;
 	}
 	lasers[parse%numLasers].x = enemyReflector.x - 6;

@@ -81,3 +81,18 @@ Sprite::Sprite(int x1, int y1, int l, const uint8_t* p, bool objType, bool isEne
 			vy = AIYSPEED;
 	 }
 }
+
+//---------------------------powerup function initializations-------------
+
+int powerups::randomizer() {
+	return Random() % 100;
+}
+
+void powerups::activatePower() {
+	if (powerUpReady){
+		int index = hash(randomizer());
+		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
+		
+	}
+}
+

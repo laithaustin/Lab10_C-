@@ -1,7 +1,7 @@
 Dependencies for Project 'Lab10_C++', Target 'Lab 10': (DO NOT MODIFY !)
 CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARMCC
 F (.\startup_TM4C123.s)(0x608F3B75)(--cpu Cortex-M4 --pd "__EVAL SETA 1" -g --apcs=interwork -I.\RTE\_Lab_10-IC:\Users\jgdun\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\jgdun\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123--pd "__UVISION_VERSION SETA 533" --pd "_RTE_ SETA 1" --pd "TM4C123GH6PM SETA 1" --pd "_RTE_ SETA 1"--list .\startup_tm4c123.lst --xref -o .\startup_tm4c123.o --depend .\startup_tm4c123.d)
-F (.\main.cpp)(0x608F3CE8)(--cpp -c --cpu Cortex-M4 -D__EVAL -g -O0 --apcs=interwork -I.\RTE\_Lab_10-IC:\Users\jgdun\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\jgdun\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="533" -D_RTE_ -DTM4C123GH6PM -D_RTE_-o .\main.o --omf_browse .\main.crf --depend .\main.d)
+F (.\main.cpp)(0x608F5B05)(--cpp -c --cpu Cortex-M4 -D__EVAL -g -O0 --apcs=interwork -I.\RTE\_Lab_10-IC:\Users\jgdun\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\jgdun\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="533" -D_RTE_ -DTM4C123GH6PM -D_RTE_-o .\main.o --omf_browse .\main.crf --depend .\main.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8EF392)
 I (../inc/tm4c123gh6pm.h)(0x5388C2DA)
 I (TExaS.h)(0x608B2A2F)
@@ -14,6 +14,7 @@ I (Timer0.h)(0x608E3C78)
 I (Timer1.h)(0x608B2A30)
 I (Timer2.h)(0x608B2A30)
 I (Sprite.h)(0x608F13F1)
+I (powerups.h)(0x608F50E8)
 F (.\DAC.cpp)(0x608B2A2E)(--cpp -c --cpu Cortex-M4 -D__EVAL -g -O0 --apcs=interwork -I.\RTE\_Lab_10-IC:\Users\jgdun\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\jgdun\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="533" -D_RTE_ -DTM4C123GH6PM -D_RTE_-o .\dac.o --omf_browse .\dac.crf --depend .\dac.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8EF392)
 I (../inc/tm4c123gh6pm.h)(0x5388C2DA)
@@ -54,7 +55,13 @@ I (../inc/tm4c123gh6pm.h)(0x5388C2DA)
 F (.\Switch.cpp)(0x608F36FB)(--cpp -c --cpu Cortex-M4 -D__EVAL -g -O0 --apcs=interwork -I.\RTE\_Lab_10-IC:\Users\jgdun\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\jgdun\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="533" -D_RTE_ -DTM4C123GH6PM -D_RTE_-o .\switch.o --omf_browse .\switch.crf --depend .\switch.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8EF392)
 I (../inc/tm4c123gh6pm.h)(0x5388C2DA)
-F (.\Sprite.cpp)(0x608F1D13)(--cpp -c --cpu Cortex-M4 -D__EVAL -g -O0 --apcs=interwork -I.\RTE\_Lab_10-IC:\Users\jgdun\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\jgdun\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="533" -D_RTE_ -DTM4C123GH6PM -D_RTE_-o .\sprite.o --omf_browse .\sprite.crf --depend .\sprite.d)
+F (.\Sprite.cpp)(0x608F5AB8)(--cpp -c --cpu Cortex-M4 -D__EVAL -g -O0 --apcs=interwork -I.\RTE\_Lab_10-IC:\Users\jgdun\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\jgdun\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="533" -D_RTE_ -DTM4C123GH6PM -D_RTE_-o .\sprite.o --omf_browse .\sprite.crf --depend .\sprite.d)
 I (Sprite.h)(0x608F13F1)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8EF392)
 I (../inc/tm4c123gh6pm.h)(0x5388C2DA)
+F (.\powerups.cpp)(0x608F5B87)(--cpp -c --cpu Cortex-M4 -D__EVAL -g -O0 --apcs=interwork -I.\RTE\_Lab_10-IC:\Users\jgdun\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\jgdun\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C123-D__UVISION_VERSION="533" -D_RTE_ -DTM4C123GH6PM -D_RTE_-o .\powerups.o --omf_browse .\powerups.crf --depend .\powerups.d)
+I (powerups.h)(0x608F50E8)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8EF392)
+I (Sprite.h)(0x608F13F1)
+I (../inc/tm4c123gh6pm.h)(0x5388C2DA)
+I (images.h)(0x608E403F)

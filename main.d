@@ -11,3 +11,4 @@
 .\main.o: Timer1.h
 .\main.o: Timer2.h
 .\main.o: Sprite.h
+.\main.o: powerups.h

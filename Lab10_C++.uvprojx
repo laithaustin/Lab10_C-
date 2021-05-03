@@ -453,6 +453,11 @@
               <FileType>8</FileType>
               <FilePath>.\Sprite.cpp</FilePath>
             </File>
+            <File>
+              <FileName>powerups.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\powerups.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

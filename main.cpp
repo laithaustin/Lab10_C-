@@ -55,7 +55,7 @@
 #include "Timer1.h"
 #include "Timer2.h"
 #include "Sprite.h"
-
+#include "powerups.h"
 //********************************************************************************
 // debuging profile, pick up to 7 unused bits and send to Logic Analyzer
 #define PA54                  (*((volatile uint32_t *)0x400040C0)) // bits 5-4
@@ -100,6 +100,8 @@ void Profile_Init(void){
   NVIC_EN0_R = 0x40000000;          // enable interrupt 30 in NVIC
   GPIO_PORTA_DIR_R &=  ~0xC;   // input on PA2 PA3
   GPIO_PORTA_DEN_R |=  0xC;   // enable on PA2 PA3
+	GPIO_PORTA_DEN_R |= 0x10; //enable on PA4
+	GPIO_PORTA_DIR_R |= 0x10; //output on PA4
 }
 
 //********************************************************************************

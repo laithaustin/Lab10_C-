@@ -9,10 +9,6 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 #include <stdint.h>
-#include "Images.h"
-
-#define rHeight 14
-#define bHeight 4
 
 typedef enum {dead, alive} status_t;
 typedef enum {up, down, fix} direction_t;
@@ -48,9 +44,9 @@ class Sprite{
 		void draw(); //our means of outputting to display
 		void reset(); //reset conditions of program
 		bool collision(Sprite first, Sprite second);
-	
+		void moveLaser();
+  
 };
-
 
 
 #endif

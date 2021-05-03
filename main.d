@@ -12,3 +12,4 @@
 .\main.o: Timer2.h
 .\main.o: Sprite.h
 .\main.o: powerups.h
+.\main.o: sound.h

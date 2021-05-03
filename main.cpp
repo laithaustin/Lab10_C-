@@ -56,6 +56,8 @@
 #include "Timer2.h"
 #include "Sprite.h"
 #include "powerups.h"
+#include "sound.h"
+
 //********************************************************************************
 // debuging profile, pick up to 7 unused bits and send to Logic Analyzer
 #define PA54                  (*((volatile uint32_t *)0x400040C0)) // bits 5-4
@@ -345,6 +347,7 @@ int main(void){
   Profile_Init(); // PA3,PA2,PF3,PF2,PF1 
   Random_Init(1);
 	EnableInterrupts();
+	Sound_Init();
 	introAnimation();
 	SSD1306_ClearBuffer();
 	if (English) { //draw static menu
@@ -424,6 +427,7 @@ void PeriodicLaserHandler() {
 	lasers[0].isProjectile = true;
 	lasers[0].length = 2;
 	lasers[0].life = alive;
+	Sound_Start(shoot,4080);
 }
 //------------------------------implement functions of sprite below-----------------------------------------------
 
@@ -481,10 +485,12 @@ void Sprite::nextRound(){
 			for (int i = 0; i < BALLS; i++){
 				bouncyBalls[i].life = dead;
 			}
-			enemyReflector.vy += 2;
+			enemyReflector.vy += 1;
 			numLasers = 1;
 			Timer0_Init(PeriodicLaserHandler,80000*50*35);
 	} else if (enemyReflector.round == '6') {
+			reset();
+			TIMER0_CTL_R = 0x00000000;    // 1) disable TIMER0A (laser)
 	}
 }
 
@@ -525,7 +531,7 @@ void Sprite::PointScored(int who) {
 			bouncyBall.vy = 0;
 			bouncyBall.vx = 0;
 			bouncyBall.life = alive;
-			bouncyBall.vx = -3;
+			bouncyBall.vx = -6;
 		}
 }
 

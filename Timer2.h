@@ -22,6 +22,7 @@
  http://users.ece.utexas.edu/~valvano/
  */
 
+#include <stdint.h>
 #ifndef __TIMER2INTS_H__ // do not include more than once
 #define __TIMER2INTS_H__
 

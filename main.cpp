@@ -500,6 +500,9 @@ void Sprite::reset() {
 		enemyReflector.x = 122-6;
 		bouncyBall.ax = 0;
 		bouncyBall.vx = -3;
+		bouncyBall.x = 63;
+		bouncyBall.y = 31;
+		bouncyBall.life = alive;
 		reverseMode = false;
 		for (int i = 0; i < numBalls; i++) {
 				bouncyBalls[i].life = dead; //spawn 2 balls
@@ -531,6 +534,8 @@ void saveStates () {
 
 void restoreSaves (){
 	goodGuy = gGuy_S;
+	uint32_t data = (reverseMode) ? (PRECISION - ADC_In()) : ADC_In();
+	goodGuy.move(data);
 	enemyReflector = eReflector_S ;
 	bouncyBall = bBall_S ;
 	for (int i = 0; i < NUMBALLS; i++){
@@ -595,6 +600,7 @@ void Sprite::nextRound(){
 		//TODO: Write rest of round 6 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '7') {
 			reset();
+			bouncyBall.life = dead; //main ball is out
 			numBalls = 2;
 			numLasers = 1;
 			enemyReflector.vy += 2;
@@ -612,9 +618,9 @@ void Sprite::nextRound(){
 		//TODO: Write rest of round 8 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '9') {
 			reset();
+			numLasers = 15;
 			saveStates();
 			pUps.powerUpActivate();
-			numLasers = 15;
 			Timer0_Init(PeriodicBulletHellHandler,80000*50*4);
 	} else if (enemyReflector.round == ':') {
 			TIMER2_CTL_R = 0x0;
@@ -622,6 +628,7 @@ void Sprite::nextRound(){
 //			pUps.powerUpActivate();
 			bouncyBall.life = dead;
 			numBalls = 10;
+			numLasers = 1;
 			enemyReflector.vy += 3;
 			Timer3_Init(PeriodicBallHandler,80000*50*17);
 			Timer0_Init(PeriodicLaserHandler,80000*50*10);
@@ -684,6 +691,12 @@ void Sprite::PointScored(int who) {
 		else if (goodGuy.round == '6') {
 			//TODO: write reset requirements
 			restoreSaves();
+			bouncyBall.x = 63;
+			bouncyBall.y = 31;
+			bouncyBall.vy = 0;
+			bouncyBall.vx = 0;
+			bouncyBall.life = alive;
+			bouncyBall.vx = -6;
 		}
 		else if (goodGuy.round == '7') {
 			//TODO: write reset requirements
@@ -700,7 +713,7 @@ void Sprite::PointScored(int who) {
 		}
 		else if (goodGuy.round == '8') {
 			//TODO: write reset requirements
-			bouncyBall.x = 60;
+			bouncyBall.x = 63;
 			bouncyBall.y = 31;
 			bouncyBall.vy = 0;
 			bouncyBall.vx = 0;
@@ -795,7 +808,7 @@ void Sprite::physics() {
 	} else {
 		//account for ball collisions
 		for (int i = 0; i < numBalls; i++){ //replace 2 with a var
-			if (this != &bouncyBalls[i] && bouncyBalls[i].life == alive){
+			if (this != &bouncyBalls[i] && bouncyBalls[i].life == alive && this->life == alive){
 				if (collision(*this,bouncyBalls[i])){
 					int tempx = vx;
 					int tempy = vy;
@@ -842,9 +855,9 @@ void Sprite::logic() {
 			if (enemyReflector.x <= 63) {
 				enemyReflector.vx = -enemyReflector.vx;
 				enemyReflector.x = 63;
-			} else if (enemyReflector.x >= 127 - BALLH) {
+			} else if (enemyReflector.x >= 125 - BALLH) {
 				enemyReflector.vx = -enemyReflector.vx;
-				enemyReflector.x = 127 - BALLH;
+				enemyReflector.x = 125 - BALLH;
 			}
 			if (bouncyBall.y + bouncyBall.vy < y-length/2){ //if ball is above reflector
 				y -= vy;

@@ -458,6 +458,16 @@
               <FileType>8</FileType>
               <FilePath>.\powerups.cpp</FilePath>
             </File>
+            <File>
+              <FileName>Timer3.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Timer3.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Timer3.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Timer3.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

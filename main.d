@@ -13,3 +13,4 @@
 .\main.o: Sprite.h
 .\main.o: powerups.h
 .\main.o: Sound.h
+.\main.o: Timer3.h

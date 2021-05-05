@@ -35,6 +35,7 @@ class Sprite{
 	public:
 		Sprite(int x, int y, int length, const uint8_t *image, bool type, bool isEnemy); //constructor
 		Sprite();
+		void operator=(Sprite &s);
 		void move(int data); //describes movement for every 50 ms interrupt
 		void PointScored(int who);
 		void nextRound();

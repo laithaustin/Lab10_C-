@@ -75,6 +75,7 @@ Sprite::Sprite(int x1, int y1, int l, const uint8_t* p, bool objType, bool isEne
 	 life = alive;
 	 image = p;
 	 isProjectile = objType; //check if it's a projectile
+	 isSpikeyBall = false;
 	 if (isProjectile){
 			vx = BALLSPEED; //INITIALLY WILL MOVE HORIZONTALLY
 	 }
@@ -95,6 +96,7 @@ void Sprite::operator=(Sprite &s){
 	isProjectile = s.isProjectile;
 	isEnemy = s.isEnemy;
 	life = s.life;
+	isSpikeyBall = false;
 }
 
 

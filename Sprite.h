@@ -30,6 +30,7 @@ class Sprite{
 		bool pUpsEnabled;
 		bool isProjectile;
 		bool isEnemy;
+		bool isSpikeyBall;
 		bool needToDraw; //asmaphore
 	
 	public:
@@ -46,7 +47,7 @@ class Sprite{
 		void reset(); //reset conditions of program
 		bool collision(Sprite first, Sprite second);
 		void moveLaser();
-  
+		void moveSpike();
 };
 
 

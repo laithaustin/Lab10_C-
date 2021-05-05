@@ -126,6 +126,7 @@ void Delay100ms(uint32_t count); // time delay in 0.1 seconds
 #define NUMBALLS 13
 
 int numBalls = 0;
+int numSpikeyBalls = 0;
 bool reverseMode = false; //dictates the annoyingness of the game
 bool English = true;
 bool noCollisionsMode = false;
@@ -137,14 +138,15 @@ bool menu = true;
 
 Sprite goodGuy(5, 31,REFLECTORH, reflector, false, false);
 Sprite gGuy_S = goodGuy;
-Sprite bouncyBall(63,31,BALLH, ball, true, false);
+Sprite bouncyBall(63,31,REFLECTORH, ball, true, false);
 Sprite bBall_S = bouncyBall;
-Sprite enemyReflector(122-6,31,REFLECTORH,reflector, false, true);
+Sprite enemyReflector(122-6,31,BALLH, reflector, false, true);
 Sprite eReflector_S = enemyReflector;
 Sprite bouncyBalls[NUMBALLS];
 Sprite bBalls_S[NUMBALLS];
 powerups pUps(goodGuy, enemyReflector, bouncyBall, &reverseMode, &noCollisionsMode);
 Sprite lasers[25];
+Sprite spikeyBalls[5];
 
 
 void SysTick_Init(unsigned long period){
@@ -164,6 +166,14 @@ void SysTick_Init(unsigned long period){
 void Draw(Sprite &p){
 	bool drawLeaderboard = true;
 	SSD1306_ClearBuffer();
+	if (p.round == '8' || p.round == ':') {
+		for (int i = 0; i < numSpikeyBalls; i++) {
+			if (spikeyBalls[i].life == alive) {
+				SSD1306_DrawBMP(spikeyBalls[i].x, spikeyBalls[i].y, spikeyBalls[i].image, 0, SSD1306_WHITE);
+				if (spikeyBalls[i].y >= spikeyBalls[i].length && spikeyBalls[i].y <= spikeyBalls[i].length + 12) drawLeaderboard = false;
+			}
+		}
+	}
 	if(p.round == '5' || p.round == '7' || p.round == '9' || p.round == ':') {
 		for (int i = 0; i < numLasers; i++) {
 			if (lasers[i].life == alive) {
@@ -397,9 +407,6 @@ int main(void){
   SSD1306_OutBuffer();
 }
 
-// You can't use this timer, it is here for starter code only 
-// you must use interrupts to perform delays
-
 void SysTick_Handler(void){
 	if (menu) {
 		menuPointer = ADC_In();
@@ -425,7 +432,32 @@ void SysTick_Handler(void){
 				}
 			}
 		}
+		if (goodGuy.round == '8' || goodGuy.round == ':') {
+			for (int i = 0; i < numSpikeyBalls; i++) {
+				if (spikeyBalls[i].life == alive) {
+					spikeyBalls[i].moveSpike();
+				}
+			}
+		}
 	}
+}
+
+int spikeParse = 0;
+
+void PeriodicSpikeyBallHandler() {
+	if (!roundStarted) return;
+	if (spikeyBalls[spikeParse%numSpikeyBalls].life == alive) return;
+	spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
+	spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+	spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
+	spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
+	spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
+	spikeyBalls[spikeParse%numSpikeyBalls].isProjectile = false;
+	spikeyBalls[spikeParse%numSpikeyBalls].isSpikeyBall = true;
+	spikeyBalls[spikeParse%numSpikeyBalls].length = 9;
+	spikeyBalls[spikeParse%numSpikeyBalls].image = SpikeyBallImage;
+	spikeyBalls[spikeParse%numSpikeyBalls].life = alive;
+	spikeParse++;
 }
 
 void PeriodicLaserHandler() {
@@ -464,6 +496,19 @@ uint32_t ballParse = 0;
 
 void PeriodicBallHandler() {
 	if (!roundStarted) return;
+	if (goodGuy.round == ':' && spikeyBalls[spikeParse%numSpikeyBalls].life == dead) {
+		spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
+		spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+		spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
+		spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
+		spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
+		spikeyBalls[spikeParse%numSpikeyBalls].isProjectile = false;
+		spikeyBalls[spikeParse%numSpikeyBalls].isSpikeyBall = true;
+		spikeyBalls[spikeParse%numSpikeyBalls].length = 9;
+		spikeyBalls[spikeParse%numSpikeyBalls].image = SpikeyBallImage;
+		spikeyBalls[spikeParse%numSpikeyBalls].life = alive;
+		spikeParse++;
+	}
 	if (bouncyBalls[ballParse%numBalls].life == alive) return;
 	bouncyBalls[ballParse%numBalls].x = enemyReflector.x - 4;
 	bouncyBalls[ballParse%numBalls].y = enemyReflector.y - 5;
@@ -495,8 +540,6 @@ void Delay100ms(uint32_t count){
 void Sprite::reset() {
 		enemyReflector.length = REFLECTORH;
 		enemyReflector.image = reflector;
-		enemyReflector.x = 122-6;
-		enemyReflector.vx = 0;
 		enemyReflector.vy = AIYSPEED;
 		enemyReflector.x = 122-6;
 		bouncyBall.ax = 0;
@@ -505,6 +548,11 @@ void Sprite::reset() {
 		bouncyBall.y = 31;
 		bouncyBall.life = alive;
 		reverseMode = false;
+		for (int i = 0; i < numSpikeyBalls; i++) {
+				spikeyBalls[i].life = dead;
+				spikeyBalls[i].x = 61;
+				spikeyBalls[i].y = 31;
+		}
 		for (int i = 0; i < numBalls; i++) {
 				bouncyBalls[i].life = dead; //spawn 2 balls
 				bouncyBalls[i].x = (Random() % 20) + 50;
@@ -516,6 +564,7 @@ void Sprite::reset() {
 				lasers[i].x = 61;
 				lasers[i].y = 31;
 		}
+		numSpikeyBalls = 0;
 		numBalls = 0;
 		numLasers = 0;
 }
@@ -605,16 +654,29 @@ void Sprite::nextRound(){
 			numBalls = 2;
 			numLasers = 1;
 			enemyReflector.vy += 2;
-            saveStates();
+      saveStates();
 			pUps.powerUpActivate();
 			Timer0_Init(PeriodicLaserHandler,80000*50*35);
 			Timer3_Init(PeriodicBallHandler,80000*50*23);
 		//TODO: Write rest of round 7 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '8') {
 			TIMER3_CTL_R = 0x00000000;
-		    TIMER0_CTL_R = 0x00000000;
 			reset();
+			enemyReflector.vy += 2;
+			numSpikeyBalls = 3;
+			spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
+			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+			spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
+			spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
+			spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
+			spikeyBalls[spikeParse%numSpikeyBalls].isProjectile = false;
+			spikeyBalls[spikeParse%numSpikeyBalls].isSpikeyBall = true;
+			spikeyBalls[spikeParse%numSpikeyBalls].length = 9;
+			spikeyBalls[spikeParse%numSpikeyBalls].image = SpikeyBallImage;
+			spikeyBalls[spikeParse%numSpikeyBalls].life = alive;
+			spikeParse++;
 			saveStates();
+			Timer0_Init(PeriodicSpikeyBallHandler,80000*40);
 			pUps.powerUpActivate();
 		//TODO: Write rest of round 8 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '9') {
@@ -630,8 +692,20 @@ void Sprite::nextRound(){
 			bouncyBall.life = dead;
 			numBalls = 10;
 			numLasers = 1;
+			numSpikeyBalls = 3;
+			spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
+			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+			spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
+			spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
+			spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
+			spikeyBalls[spikeParse%numSpikeyBalls].isProjectile = false;
+			spikeyBalls[spikeParse%numSpikeyBalls].isSpikeyBall = true;
+			spikeyBalls[spikeParse%numSpikeyBalls].length = 9;
+			spikeyBalls[spikeParse%numSpikeyBalls].image = SpikeyBallImage;
+			spikeyBalls[spikeParse%numSpikeyBalls].life = alive;
+			spikeParse++;
 			enemyReflector.vy += 3;
-			Timer3_Init(PeriodicBallHandler,80000*50*17);
+			Timer3_Init(PeriodicBallHandler,80000*50*100);
 			Timer0_Init(PeriodicLaserHandler,80000*50*10);
 		//TODO: Write rest of round 10 conditions, reset conditions, and point scored conditions (FINAL BOSS)
 	} else if (enemyReflector.round == ';') {
@@ -654,8 +728,8 @@ void Sprite::PointScored(int who) {
 			goodGuy.life = dead;
 		}
 		if (goodGuy.round < '4'){
-            restoreSaves(); //restore round conditions
-		    bouncyBall.x = 63;
+			restoreSaves(); //restore round conditions
+		  bouncyBall.x = 63;
 			bouncyBall.y = 31;
 			bouncyBall.vy = 0;
 			bouncyBall.vx = 0;
@@ -714,12 +788,29 @@ void Sprite::PointScored(int who) {
 		}
 		else if (goodGuy.round == '8') {
 			//TODO: write reset requirements
+			for (int i = 0; i < numSpikeyBalls; i++) {
+				spikeyBalls[i].life = dead;
+				spikeyBalls[i].x = 61;
+				spikeyBalls[i].y = 31;
+			}
 			bouncyBall.x = 63;
 			bouncyBall.y = 31;
 			bouncyBall.vy = 0;
 			bouncyBall.vx = 0;
 			bouncyBall.life = alive;
 			bouncyBall.vx = -6;
+			spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
+			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+			spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
+			spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
+			spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
+			spikeyBalls[spikeParse%numSpikeyBalls].isProjectile = false;
+			spikeyBalls[spikeParse%numSpikeyBalls].isSpikeyBall = true;
+			spikeyBalls[spikeParse%numSpikeyBalls].length = 9;
+			spikeyBalls[spikeParse%numSpikeyBalls].image = SpikeyBallImage;
+			spikeyBalls[spikeParse%numSpikeyBalls].life = alive;
+			spikeParse++;
+			Timer0_Init(PeriodicSpikeyBallHandler,80000*50*40);
 		}
 		else if (goodGuy.round == '9') {
 			restoreSaves();
@@ -736,7 +827,11 @@ void Sprite::PointScored(int who) {
 			bouncyBall.vx = -6;
 		}
 		else if (goodGuy.round == ':') {
-			restoreSaves();
+			for (int i = 0; i < numSpikeyBalls; i++) {
+				spikeyBalls[i].life = dead;
+				spikeyBalls[i].x = 61;
+				spikeyBalls[i].y = 31;
+			}
 			for (int i = 0; i < numLasers; i++) {
 				lasers[i].life = dead;
 				lasers[i].x = 61;
@@ -745,7 +840,18 @@ void Sprite::PointScored(int who) {
 			for (int i = 0; i < numBalls; i++) {
 				bouncyBalls[i].life = dead;
 			}
-			Timer3_Init(PeriodicBallHandler,80000*50*17);
+			spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
+			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+			spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
+			spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
+			spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
+			spikeyBalls[spikeParse%numSpikeyBalls].isProjectile = false;
+			spikeyBalls[spikeParse%numSpikeyBalls].isSpikeyBall = true;
+			spikeyBalls[spikeParse%numSpikeyBalls].length = 9;
+			spikeyBalls[spikeParse%numSpikeyBalls].image = SpikeyBallImage;
+			spikeyBalls[spikeParse%numSpikeyBalls].life = alive;
+			spikeParse++;
+			Timer3_Init(PeriodicBallHandler,80000*50*100);
 			Timer0_Init(PeriodicLaserHandler,80000*50*10);
 		}
 }
@@ -909,6 +1015,20 @@ void Sprite::moveLaser() {
 		}
 	}
 	if ((x <= goodGuy.x + REFLECTORW) && (y <= goodGuy.y) && (y > goodGuy.y - REFLECTORH) && life == alive){
+		needToDraw = false;
+		enemyReflector.PointScored(0);
+	}
+}
+
+void Sprite::moveSpike() {
+	if (life == dead) return;
+	x -= 2;
+	if (x <= 1) life = dead;
+	needToDraw = true;
+	if (life == dead) return;
+	if (goodGuy.y > y) y += 1;
+	else if (goodGuy.y < y) y -= 1;
+	if ((x <= goodGuy.x + REFLECTORW) && (y - 9 <= goodGuy.y) && (y > goodGuy.y - REFLECTORH)){
 		needToDraw = false;
 		enemyReflector.PointScored(0);
 	}

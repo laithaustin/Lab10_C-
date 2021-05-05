@@ -315,9 +315,8 @@ void goToMenu(void) {
 
 void introAnimation(void) {
 	SSD1306_ClearBuffer();
-    SSD1306_DrawBMP(54, 9, PongScreen1, 0, SSD1306_WHITE);
-    SSD1306_OutBuffer();
-	ADC_Init();
+  SSD1306_DrawBMP(54, 9, PongScreen1, 0, SSD1306_WHITE);
+  SSD1306_OutBuffer();
 	Delay100ms(1);
 	SSD1306_ClearBuffer();
 	SSD1306_DrawBMP(42, 15, PongScreen2, 0, SSD1306_WHITE);
@@ -367,8 +366,9 @@ int main(void){
   SSD1306_Init(SSD1306_SWITCHCAPVCC);
   SSD1306_OutClear();
   SysTick_Init(80000*50);
+	ADC_Init();
   Profile_Init(); // PA3,PA2,PF3,PF2,PF1
-  Random_Init(NVIC_ST_CURRENT_R);
+  Random_Init(NVIC_ST_CURRENT_R * ADC_In());
 	EnableInterrupts();
 	Sound_Init();
 	introAnimation();
@@ -401,7 +401,6 @@ int main(void){
 // you must use interrupts to perform delays
 
 void SysTick_Handler(void){
-	Random_Init(ADC_In());
 	if (menu) {
 		menuPointer = ADC_In();
 	}
@@ -582,18 +581,18 @@ void Sprite::nextRound(){
 			pUps.powerUpActivate(); //enable PA4 powerup interrupt
 	} else if (enemyReflector.round == '5') {
 			reset();
-			saveStates();
 			pUps.powerUpActivate();
 			for (int i = 0; i < numBalls; i++){
 				bouncyBalls[i].life = dead;
 			}
 			enemyReflector.vy += 1;
 			numLasers = 1;
+			saveStates();
 			Timer0_Init(PeriodicLaserHandler,80000*50*35);
 	} else if (enemyReflector.round == '6') {
 			reset();
 			TIMER0_CTL_R = 0x00000000;    // 1) disable TIMER0A (laser)
-			enemyReflector.vy += 1;
+			enemyReflector.vy += 2;
 			enemyReflector.vx = 1;
 			saveStates();
 			pUps.powerUpActivate();
@@ -607,7 +606,7 @@ void Sprite::nextRound(){
             saveStates();
 			pUps.powerUpActivate();
 			Timer0_Init(PeriodicLaserHandler,80000*50*35);
-			Timer3_Init(PeriodicBallHandler,80000*50*46);
+			Timer3_Init(PeriodicBallHandler,80000*50*23);
 		//TODO: Write rest of round 7 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '8') {
 			TIMER3_CTL_R = 0x00000000;
@@ -786,7 +785,9 @@ void Sprite::wallPhysics(){
 				} else {
 					vy = 0;		
 				}
-			} else if ((x+vx >= enemyReflector.x) && ((y - 4 <= enemyReflector.y) && (y + vy >= enemyReflector.y - enemyReflector.length-1))){
+			} else if (enemyReflector.round == '6' && x >= enemyReflector.x + 2) {
+				goodGuy.PointScored(1);
+			}	else if ((x+vx >= enemyReflector.x) && ((y - 4 <= enemyReflector.y) && (y + vy >= enemyReflector.y - enemyReflector.length-1))){
 				x = enemyReflector.x - 1;
 				vx = -vx;
 				vx -= ax;
@@ -826,10 +827,13 @@ void Sprite::physics() {
 Sprite *findClosestBall(int balls){
 	Sprite *p = &bouncyBalls[0];
 	for (int i = 1; i < balls; i++){
-		if (bouncyBalls[i].x > p->x){
+		if (bouncyBalls[i].x > p->x && bouncyBalls[i].life == alive){
 			p = &bouncyBalls[i]; 
 		}
-		else if (bouncyBalls[i].vx > 0 && p->vx < 0) {
+		else if (bouncyBalls[i].vx > 0 && p->vx < 0 && bouncyBalls[i].life == alive) {
+			p = &bouncyBalls[i];
+		}
+		if (p->life == dead) {
 			p = &bouncyBalls[i];
 		}
 	}

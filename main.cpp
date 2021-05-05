@@ -104,7 +104,8 @@ void Profile_Init(void){
   GPIO_PORTA_DIR_R &=  ~0xC;   // input on PA2 PA3
   GPIO_PORTA_DEN_R |=  0xC;   // enable on PA2 PA3
 	GPIO_PORTA_DEN_R |= 0x10; //enable on PA4
-	GPIO_PORTA_DIR_R |= 0x10; //output on PA4
+  GPIO_PORTA_DEN_R |= 0x10; //enable on PA4
+  GPIO_PORTA_DIR_R |= 0x10; //output on PA4
 }
 
 //********************************************************************************
@@ -325,8 +326,8 @@ void goToMenu(void) {
 
 void introAnimation(void) {
 	SSD1306_ClearBuffer();
-  SSD1306_DrawBMP(54, 9, PongScreen1, 0, SSD1306_WHITE);
-  SSD1306_OutBuffer();
+    SSD1306_DrawBMP(54, 9, PongScreen1, 0, SSD1306_WHITE);
+    SSD1306_OutBuffer();
 	ADC_Init();
 	Delay100ms(1);
 	SSD1306_ClearBuffer();
@@ -366,7 +367,6 @@ void introAnimation(void) {
 	Delay100ms(10);
 }
 
-
 int main(void){
   DisableInterrupts();
   // pick one of the following three lines, all three set to 80 MHz
@@ -375,9 +375,9 @@ int main(void){
   //TExaS_Init(&ScopeTask);       // or 3) call to activate analog scope PD2
   SSD1306_Init(SSD1306_SWITCHCAPVCC);
   SSD1306_OutClear();
-	SysTick_Init(80000*50);
-  Profile_Init(); // PA3,PA2,PF3,PF2,PF1 
-  Random_Init(1);
+  SysTick_Init(80000*50);
+  Profile_Init(); // PA3,PA2,PF3,PF2,PF1
+  Random_Init(NVIC_ST_CURRENT_R);
 	EnableInterrupts();
 	Sound_Init();
 	introAnimation();
@@ -410,6 +410,7 @@ int main(void){
 // you must use interrupts to perform delays
 
 void SysTick_Handler(void){
+	Random_Init(ADC_In());
 	if (menu) {
 		menuPointer = ADC_In();
 	}
@@ -426,7 +427,7 @@ void SysTick_Handler(void){
 				bouncyBalls[i].move(0);
 			}
 		}
-		if (goodGuy.round == '5' || goodGuy.round == '9' || goodGuy.round == ':'){
+		if (goodGuy.round == '5' || goodGuy.round == '7' || goodGuy.round == '9' || goodGuy.round == ':'){
 			for(int i = 0; i < numLasers; i++) {
 				if (lasers[i].life == alive) {
 					lasers[i].vx = -10;
@@ -505,6 +506,7 @@ void Sprite::reset() {
 		enemyReflector.length = REFLECTORH;
 		enemyReflector.image = reflector;
 		enemyReflector.vy = AIYSPEED;
+		enemyReflector.x = 122-6;
 		bouncyBall.ax = 0;
 		bouncyBall.vx = -3;
 		reverseMode = false;
@@ -519,6 +521,8 @@ void Sprite::reset() {
 				lasers[i].x = 61;
 				lasers[i].y = 31;
 		}
+		numBalls = 0;
+		numLasers = 0;
 }
 
 
@@ -533,10 +537,12 @@ void Sprite::nextRound(){
 			enemyReflector.length = 22;
 			enemyReflector.image = biggerReflector;
 			enemyReflector.vy += 1;
+			pUps.powerUpActivate(); //enable PA4 powerup interrupt
 	} else if (enemyReflector.round == '3'){
 		  reset();
 			enemyReflector.vy += 2;
 			bouncyBall.ax = 1;
+			pUps.powerUpActivate(); //enable PA4 powerup interrupt
 	} else if (enemyReflector.round == '4'){
 			reset();
 			reverseMode = true;
@@ -565,14 +571,21 @@ void Sprite::nextRound(){
 			Timer0_Init(PeriodicLaserHandler,80000*50*35);
 	} else if (enemyReflector.round == '6') {
 			reset();
-			pUps.powerUpActivate();
 			TIMER0_CTL_R = 0x00000000;    // 1) disable TIMER0A (laser)
+			enemyReflector.vy += 1;
+			enemyReflector.x = 1;
 		//TODO: Write rest of round 6 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '7') {
 			reset();
+			numLasers = 1;
+			enemyReflector.vy += 2;
 			pUps.powerUpActivate();
+			Timer0_Init(PeriodicLaserHandler,80000*50*35);
+			Timer3_Init(PeriodicBallHandler,80000*50*46);
 		//TODO: Write rest of round 7 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '8') {
+			TIMER3_CTL_R = 0x00000000;
+		  TIMER0_CTL_R = 0x00000000;
 			reset();
 			pUps.powerUpActivate();
 		//TODO: Write rest of round 8 conditions, reset conditions, and point scored conditions
@@ -592,6 +605,8 @@ void Sprite::nextRound(){
 			Timer0_Init(PeriodicLaserHandler,80000*50*10);
 		//TODO: Write rest of round 10 conditions, reset conditions, and point scored conditions (FINAL BOSS)
 	} else if (enemyReflector.round == ';') {
+			TIMER3_CTL_R = 0x00000000;
+		  TIMER0_CTL_R = 0x00000000;
 			goodGuy.life = dead;
 			bouncyBall.score++; //don't worry about this line, it has to do with how delays are implemented each round
 	}
@@ -608,13 +623,16 @@ void Sprite::PointScored(int who) {
 			//implement losing mechanic/screen
 			goodGuy.life = dead;
 		}
-		if (goodGuy.round != '4' && goodGuy.round != '5' && goodGuy.round != '9' && goodGuy.round != ':'){
+		if (goodGuy.round < '4'){
 			bouncyBall.x = 63;
 			bouncyBall.y = 31;
 			bouncyBall.vy = 0;
 			bouncyBall.vx = 0;
 			bouncyBall.life = alive;
 			bouncyBall.vx = -6;
+			bouncyBall.image = ball;
+			noCollisionsMode = false;
+			reverseMode = false;
 		}
 		else if (goodGuy.round == '4') {
 			for (int i = 0; i < 2; i++){
@@ -638,6 +656,34 @@ void Sprite::PointScored(int who) {
 			bouncyBall.life = alive;
 			bouncyBall.vx = -6;
 		}
+		else if (goodGuy.round == '6') {
+			//TODO: write reset requirements
+			bouncyBall.x = 60;
+			bouncyBall.y = 31;
+			bouncyBall.vy = 0;
+			bouncyBall.vx = 0;
+			bouncyBall.life = alive;
+			bouncyBall.vx = -6;
+		}
+		else if (goodGuy.round == '7') {
+			//TODO: write reset requirements
+			for (int i = 0; i < numBalls; i++) {
+			}
+			for (int i = 0; i < numLasers; i++) {
+				lasers[i].life = dead;
+				lasers[i].x = 61;
+				lasers[i].y = -1;
+			}
+			Timer0_Init(PeriodicLaserHandler,80000*50*35);
+			Timer3_Init(PeriodicBallHandler,80000*50*46);
+		else if (goodGuy.round == '8') {
+			//TODO: write reset requirements
+			bouncyBall.x = 60;
+			bouncyBall.y = 31;
+			bouncyBall.vy = 0;
+			bouncyBall.vx = 0;
+			bouncyBall.life = alive;
+			bouncyBall.vx = -6;
 		else if (goodGuy.round == '9') {
 			for (int i = 0; i < numLasers; i++) {
 				lasers[i].life = dead;
@@ -689,7 +735,7 @@ bool Sprite::collision(Sprite first, Sprite second){
 }
 
 void Sprite::wallPhysics(){
-		if ((x+vx <= goodGuy.x + REFLECTORW) && ((y - 4 <= goodGuy.y) && (y >= goodGuy.y - REFLECTORH - 1))){
+		if ((x+vx <= goodGuy.x + REFLECTORW) && ((y - 4 <= goodGuy.y) && (y >= goodGuy.y - goodGuy.length - 1))){
 				x = goodGuy.x + REFLECTORW;
 				vx = -vx;
 				vx += ax;
@@ -713,13 +759,13 @@ void Sprite::wallPhysics(){
 					vy = enemyReflector.y - enemyReflector.lasty;
 					vy = (MAXYVELOCITY < vy) ? MAXYVELOCITY : vy;
 				} else {
-					vy = 0;
+					vy = 0;                                                                                                                                                          
 				}
 			}
 }
 
 void Sprite::physics() {
-	if (goodGuy.round != '4' && goodGuy.round != ':'){
+	if (goodGuy.round != '4' && goodGuy.round != '7' && goodGuy.round != ':'){
 		wallPhysics();
 	} else {
 		//account for ball collisions
@@ -755,6 +801,7 @@ Sprite *findClosestBall(int balls){
 //how the reflector makes decisions about movement
 void Sprite::logic() {
 	if (enemyReflector.round != '4' && enemyReflector.round != ':'){
+	if (enemyReflector.round != '4' && enemyReflector.round != '6' && enemyReflector.round != '7' && enemyReflector.round != ':'){
 			if (bouncyBall.y + bouncyBall.vy < y-length/2){ //if ball is above reflector
 				y -= vy;
 				if(y-length <= 2){
@@ -766,21 +813,46 @@ void Sprite::logic() {
 					y = 63;
 				}
 			} //implement a way for AI to check player's position so it can score on them
-		} else {
-			Sprite *p = findClosestBall(numBalls);
-			if (p->y + p->vy < y-length/2){ //if ball is above reflector
+		} else if (enemyReflector.round == '6') {
+			enemyReflector.x -= enemyReflector.vx;
+			if (enemyReflector.x <= 63) {
+				enemyReflector.vx = -enemyReflector.vx;
+				enemyReflector.x = 63;
+			} else if (enemyReflector.x >= 127 - BALLH) {
+				enemyReflector.vx = -enemyReflector.vx;
+				enemyReflector.x = 127 - BALLH;
+			if (bouncyBall.y + bouncyBall.vy < y-length/2){ //if ball is above reflector
 				y -= vy;
 				if(y-length <= 2){
 					y = length + 2;
 				}
-			} else if (p->y + p->vy - 4 > y - length/2){ //if ball is lower than reflector
+			} else if (bouncyBall.y + bouncyBall.vy - 4 > y - length/2){ //if ball is lower than reflector
 				y += vy;
 				if (y >= 63){
 					y = 63;
 				}
 			}
-		} 
-		if (enemyReflector.y < REFLECTORH) enemyReflector.y = REFLECTORH;
+		} else {
+			Sprite *p = findClosestBall(numBalls);
+			if (p->y + p->vy < y-length/2){ //if ball is above reflector
+				y -= vy;
+				if(y < length + 2){
+					y = length + 2;
+				}
+				if (y >= 63){
+					y = 63;
+				}
+			} else if (p->y + p->vy - 4 > y - length/2){ //if ball is lower than reflector
+				y += vy;
+				if(y < length + 2){
+					y = length + 2;
+				}
+				if (y >= 63){
+					y = 63;
+				}
+			}
+		}
+		if (enemyReflector.y < enemyReflector.length) enemyReflector.y = enemyReflector.length;
 }
 
 	//laser move conditions

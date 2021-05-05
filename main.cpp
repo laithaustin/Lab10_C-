@@ -123,37 +123,29 @@ void Delay100ms(uint32_t count); // time delay in 0.1 seconds
 #define BALLSPEED -6 //1 pixel per 50 ms
 #define AIYSPEED 1 //1 pixel per 50 ms
 #define PRECISION 4096
+#define NUMBALLS 13
 
 int numBalls = 0;
-
 bool reverseMode = false; //dictates the annoyingness of the game
 bool English = true;
 bool noCollisionsMode = false;
 bool roundStarted = false;
+int numLasers = 0;
+int cycle = 0;
+int menuPointer = 0;
+bool menu = true;
 
 Sprite goodGuy(5, 31,REFLECTORH, reflector, false, false);
+Sprite gGuy_S = goodGuy;
 Sprite bouncyBall(63,31,REFLECTORH, ball, true, false);
+Sprite bBall_S = bouncyBall;
 Sprite enemyReflector(122-6,31,BALLH, reflector, false, true);
-Sprite bouncyBalls[13];
+Sprite eReflector_S = enemyReflector;
+Sprite bouncyBalls[NUMBALLS];
+Sprite bBalls_S[NUMBALLS];
 powerups pUps(goodGuy, enemyReflector, bouncyBall, &reverseMode, &noCollisionsMode);
 Sprite lasers[25];
 
-void GPIOF_Handler() {
-		DisableInterrupts();
-		while ((GPIO_PORTF_DATA_R&0x10) == 0x0) {}
-		while ((GPIO_PORTF_DATA_R&0x10) == 0x10) {}
-		while ((GPIO_PORTF_DATA_R&0x10) == 0x0) {}
-		EnableInterrupts();
-    GPIO_PORTF_ICR_R = 0x10;
-}
-
-void GPIOA_Handler() {
-		DisableInterrupts();
-		pUps.activatePower();
-		GPIO_PORTA_DATA_R &= ~0x10; //clear LED
-		GPIO_PORTA_ICR_R = 0x04;
-		EnableInterrupts();
-}
 
 void SysTick_Init(unsigned long period){
 	NVIC_ST_CTRL_R = 0;
@@ -168,8 +160,7 @@ void SysTick_Init(unsigned long period){
 }
 
 
-int numLasers = 0;
-int cycle = 0;
+//-----------------------draw related functions/animations-----------
 void Draw(Sprite &p){
 	bool drawLeaderboard = true;
 	SSD1306_ClearBuffer();
@@ -236,8 +227,7 @@ void Draw(Sprite &p){
 	roundStarted = true;
 }
 
-int menuPointer = 0;
-bool menu = true;
+
 
 void goToMenu(void) {
 	while (menu) {
@@ -365,6 +355,8 @@ void introAnimation(void) {
 	SSD1306_OutBuffer();
 	Delay100ms(10);
 }
+
+//-----------------------------------------------------------
 
 int main(void){
   DisableInterrupts();
@@ -521,6 +513,27 @@ void Sprite::reset() {
 		}
 }
 
+//call before powerupActivate so that 
+//all possible sprites are saved with their current conditions
+//idea is to save states and then set sprites = states after a point is won
+void saveStates () {
+	gGuy_S = goodGuy;
+	eReflector_S = enemyReflector;
+	bBall_S = bouncyBall;
+	for (int i = 0; i < NUMBALLS; i++){
+		bBalls_S[i] = bouncyBalls[i];
+	}
+}
+
+
+void restoreSaves (){
+	goodGuy = gGuy_S;
+	enemyReflector = eReflector_S ;
+	bouncyBall = bBall_S ;
+	for (int i = 0; i < NUMBALLS; i++){
+		bouncyBalls[i] = bBalls_S[i] ;
+	}
+}
 
 //reset and move on to next round. after round 3, rounds are random in nature...to be implemented
 void Sprite::nextRound(){
@@ -533,17 +546,18 @@ void Sprite::nextRound(){
 			enemyReflector.length = 22;
 			enemyReflector.image = biggerReflector;
 			enemyReflector.vy += 1;
+			saveStates();
 			pUps.powerUpActivate(); //enable PA4 powerup interrupt
 	} else if (enemyReflector.round == '3'){
 		  reset();
 			enemyReflector.vy += 2;
 			bouncyBall.ax = 1;
+			saveStates();
 			pUps.powerUpActivate(); //enable PA4 powerup interrupt
 	} else if (enemyReflector.round == '4'){
 			reset();
 			reverseMode = true;
 			numBalls = 2;
-			pUps.powerUpActivate(); //enable PA4 powerup interrupt
 			for (int i = 0; i < numBalls; i++){
 				bouncyBalls[i].life = alive; //spawn 2 balls
 				bouncyBalls[i].x = (Random() % 20) + 50;
@@ -556,8 +570,11 @@ void Sprite::nextRound(){
 			}
 			enemyReflector.vy += 2;
 			bouncyBall.life = dead; //main ball is out
+			saveStates();
+			pUps.powerUpActivate(); //enable PA4 powerup interrupt
 	} else if (enemyReflector.round == '5') {
 			reset();
+			saveStates();
 			pUps.powerUpActivate();
 			for (int i = 0; i < numBalls; i++){
 				bouncyBalls[i].life = dead;
@@ -570,17 +587,22 @@ void Sprite::nextRound(){
 			TIMER0_CTL_R = 0x00000000;    // 1) disable TIMER0A (laser)
 			enemyReflector.vy += 1;
 			enemyReflector.vx = 1;
+			saveStates();
+			pUps.powerUpActivate();
 		//TODO: Write rest of round 6 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '7') {
 			reset();
+			saveStates();
 			pUps.powerUpActivate();
 		//TODO: Write rest of round 7 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '8') {
 			reset();
+			saveStates();
 			pUps.powerUpActivate();
 		//TODO: Write rest of round 8 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '9') {
 			reset();
+			saveStates();
 			pUps.powerUpActivate();
 			numLasers = 15;
 			Timer0_Init(PeriodicBulletHellHandler,80000*50*4);
@@ -612,6 +634,7 @@ void Sprite::PointScored(int who) {
 			goodGuy.life = dead;
 		}
 		if (goodGuy.round != '4' && goodGuy.round != '5' && goodGuy.round != '9' && goodGuy.round != ':' && goodGuy.round != '6'){
+			restoreSaves(); //restore round conditions
 			bouncyBall.x = 63;
 			bouncyBall.y = 31;
 			bouncyBall.vy = 0;
@@ -623,6 +646,7 @@ void Sprite::PointScored(int who) {
 			reverseMode = false;
 		}
 		else if (goodGuy.round == '4') {
+			restoreSaves();
 			for (int i = 0; i < 2; i++){
 				bouncyBalls[i].life = alive; //spawn 2 balls
 				bouncyBalls[i].x = (Random() % 20) + 50;
@@ -636,6 +660,7 @@ void Sprite::PointScored(int who) {
 		}
 		else if (goodGuy.round == '5') {
 			//TODO: write reset requirements
+			restoreSaves();
 			lasers[0].life = dead;
 			bouncyBall.x = 63;
 			bouncyBall.y = 31;
@@ -647,6 +672,7 @@ void Sprite::PointScored(int who) {
 		
 		else if (goodGuy.round == '6') {
 			//TODO: write reset requirements
+			restoreSaves();
 			bouncyBall.x = 60;
 			bouncyBall.y = 31;
 			bouncyBall.vy = 0;
@@ -655,6 +681,7 @@ void Sprite::PointScored(int who) {
 			bouncyBall.vx = -6;
 		}
 		else if (goodGuy.round == '9') {
+			restoreSaves();
 			for (int i = 0; i < numLasers; i++) {
 				lasers[i].life = dead;
 				lasers[i].x = 61;
@@ -668,6 +695,7 @@ void Sprite::PointScored(int who) {
 			bouncyBall.vx = -6;
 		}
 		else if (goodGuy.round == ':') {
+			restoreSaves();
 			for (int i = 0; i < numLasers; i++) {
 				lasers[i].life = dead;
 				lasers[i].x = 61;
@@ -877,3 +905,22 @@ void powerups::powerUpActivate() {
 	GPIO_PORTA_DATA_R |= 0x10; //LED ON
 }
 
+
+//----------------------handlers---------------------------
+
+void GPIOF_Handler() {
+		DisableInterrupts();
+		while ((GPIO_PORTF_DATA_R&0x10) == 0x0) {}
+		while ((GPIO_PORTF_DATA_R&0x10) == 0x10) {}
+		while ((GPIO_PORTF_DATA_R&0x10) == 0x0) {}
+		EnableInterrupts();
+    GPIO_PORTF_ICR_R = 0x10;
+}
+
+void GPIOA_Handler() {
+		DisableInterrupts();
+		pUps.activatePower();
+		GPIO_PORTA_DATA_R &= ~0x10; //clear LED
+		GPIO_PORTA_ICR_R = 0x04;
+		EnableInterrupts();
+}

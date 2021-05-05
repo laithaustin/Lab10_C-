@@ -83,4 +83,18 @@ Sprite::Sprite(int x1, int y1, int l, const uint8_t* p, bool objType, bool isEne
 	 }
 }
 
+//for saving states in the event of powerup usage
+void Sprite::operator=(Sprite &s){
+	x = s.x;
+	y = s.y;
+	vx = s.vx;
+	vy = s.vy;
+	needToDraw = s.needToDraw;
+	image = s.image;
+	length = s.length;
+	isProjectile = s.isProjectile;
+	isEnemy = s.isEnemy;
+	life = s.life;
+}
+
 

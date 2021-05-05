@@ -103,7 +103,6 @@ void Profile_Init(void){
   NVIC_EN0_R = 0x40000000;          // enable interrupt 30 in NVIC
   GPIO_PORTA_DIR_R &=  ~0xC;   // input on PA2 PA3
   GPIO_PORTA_DEN_R |=  0xC;   // enable on PA2 PA3
-	GPIO_PORTA_DEN_R |= 0x10; //enable on PA4
   GPIO_PORTA_DEN_R |= 0x10; //enable on PA4
   GPIO_PORTA_DIR_R |= 0x10; //output on PA4
 }
@@ -577,6 +576,7 @@ void Sprite::nextRound(){
 		//TODO: Write rest of round 6 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '7') {
 			reset();
+			numBalls = 2;
 			numLasers = 1;
 			enemyReflector.vy += 2;
 			pUps.powerUpActivate();
@@ -668,6 +668,7 @@ void Sprite::PointScored(int who) {
 		else if (goodGuy.round == '7') {
 			//TODO: write reset requirements
 			for (int i = 0; i < numBalls; i++) {
+				bouncyBalls[i].life = dead;
 			}
 			for (int i = 0; i < numLasers; i++) {
 				lasers[i].life = dead;
@@ -676,6 +677,7 @@ void Sprite::PointScored(int who) {
 			}
 			Timer0_Init(PeriodicLaserHandler,80000*50*35);
 			Timer3_Init(PeriodicBallHandler,80000*50*46);
+		}
 		else if (goodGuy.round == '8') {
 			//TODO: write reset requirements
 			bouncyBall.x = 60;
@@ -684,6 +686,7 @@ void Sprite::PointScored(int who) {
 			bouncyBall.vx = 0;
 			bouncyBall.life = alive;
 			bouncyBall.vx = -6;
+		}
 		else if (goodGuy.round == '9') {
 			for (int i = 0; i < numLasers; i++) {
 				lasers[i].life = dead;
@@ -800,7 +803,6 @@ Sprite *findClosestBall(int balls){
 
 //how the reflector makes decisions about movement
 void Sprite::logic() {
-	if (enemyReflector.round != '4' && enemyReflector.round != ':'){
 	if (enemyReflector.round != '4' && enemyReflector.round != '6' && enemyReflector.round != '7' && enemyReflector.round != ':'){
 			if (bouncyBall.y + bouncyBall.vy < y-length/2){ //if ball is above reflector
 				y -= vy;
@@ -821,6 +823,7 @@ void Sprite::logic() {
 			} else if (enemyReflector.x >= 127 - BALLH) {
 				enemyReflector.vx = -enemyReflector.vx;
 				enemyReflector.x = 127 - BALLH;
+			}
 			if (bouncyBall.y + bouncyBall.vy < y-length/2){ //if ball is above reflector
 				y -= vy;
 				if(y-length <= 2){

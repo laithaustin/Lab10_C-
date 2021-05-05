@@ -36,15 +36,18 @@ void revControls(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, 
 }
 
 void expand(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
-	
+	reflector.image = biggerReflector;
+	reflector.length = 22;
 }
 
 void shrink(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
-
+	reflector.image = reflector_small;
+	reflector.length = 4;
 }
 
 void maxSize(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
-
+	reflector.image = reflector_huge;
+	reflector.length = 50;
 }
 
 void freezeAI(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){

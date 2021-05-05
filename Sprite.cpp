@@ -21,7 +21,7 @@ void Sprite::move(int data) {
 			else if (y < lasty) dir = up;
 			else dir = fix;
 			//edge conditions
-			if (y < 15) y = 15;
+			if (y < length + 2) y = length + 2;
 			else if (y > 62) y = 62;
 			needToDraw = true;
 		}
@@ -52,6 +52,7 @@ void Sprite::move(int data) {
 		else if (life == alive && data <0){
 			//if (round == 1){
 			logic();
+			if (round == 6) 
 			needToDraw = true;
 		}
 }

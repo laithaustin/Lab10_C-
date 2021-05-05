@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Lab10_C++.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Lab10_C++.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Mon May 03 14:33:47 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Wed May 05 00:05:07 2021
 <BR><P>
 <H3>Maximum Stack Usage =        176 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1309,7 +1309,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[90]"></a>main</STRONG> (Thumb, 228 bytes, Stack size 8 bytes, main.o(.text))
+<P><STRONG><a name="[90]"></a>main</STRONG> (Thumb, 232 bytes, Stack size 8 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = main &rArr; Draw(Sprite&) &rArr; SSD1306_DrawString(short, short, char*, unsigned short) &rArr; SSD1306_DrawChar(short, short, char, unsigned short) &rArr; SSD1306_DrawPixel(short, short, unsigned short)
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSD1306_ClearBuffer()
@@ -1355,7 +1355,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> main.o(.text)
 </UL>
-<P><STRONG><a name="[b4]"></a>powerups::powerUpActivate()</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, main.o(.text))
+<P><STRONG><a name="[b4]"></a>powerups::powerUpActivate()</STRONG> (Thumb, 118 bytes, Stack size 8 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = powerups::powerUpActivate()
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Switch_Init()
@@ -1363,7 +1363,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::nextRound()
 </UL>
 
-<P><STRONG><a name="[b6]"></a>Sprite::nextRound()</STRONG> (Thumb, 568 bytes, Stack size 16 bytes, main.o(.text))
+<P><STRONG><a name="[b6]"></a>Sprite::nextRound()</STRONG> (Thumb, 508 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = Sprite::nextRound() &rArr; Sprite::reset()
 </UL>
 <BR>[Calls]<UL><LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Random()
@@ -1374,7 +1374,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::PointScored(int)
 </UL>
 
-<P><STRONG><a name="[b8]"></a>Sprite::PointScored(int)</STRONG> (Thumb, 406 bytes, Stack size 16 bytes, main.o(.text))
+<P><STRONG><a name="[b8]"></a>Sprite::PointScored(int)</STRONG> (Thumb, 456 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = Sprite::PointScored(int) &rArr; Sprite::nextRound() &rArr; Sprite::reset()
 </UL>
 <BR>[Calls]<UL><LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Random()
@@ -1384,7 +1384,7 @@ Global Symbols
 <LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::moveLaser()
 </UL>
 
-<P><STRONG><a name="[b9]"></a>Sprite::moveLaser()</STRONG> (Thumb, 108 bytes, Stack size 8 bytes, main.o(.text))
+<P><STRONG><a name="[b9]"></a>Sprite::moveLaser()</STRONG> (Thumb, 166 bytes, Stack size 8 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = Sprite::moveLaser() &rArr; Sprite::PointScored(int) &rArr; Sprite::nextRound() &rArr; Sprite::reset()
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::PointScored(int)
@@ -1392,11 +1392,12 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
 </UL>
 
-<P><STRONG><a name="[15]"></a>SysTick_Handler</STRONG> (Thumb, 314 bytes, Stack size 16 bytes, main.o(.text))
+<P><STRONG><a name="[15]"></a>SysTick_Handler</STRONG> (Thumb, 266 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 176<LI>Call Chain = SysTick_Handler &rArr; Sprite::move(int) &rArr; Sprite::physics() &rArr; Sprite::collision(Sprite, Sprite)
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::move(int)
 <LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_In()
+<LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Random_Init(unsigned)
 <LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::moveLaser()
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_tm4c123.o(RESET)
@@ -1418,7 +1419,7 @@ Global Symbols
 </UL>
 <P><STRONG><a name="[127]"></a>Sprite::Sprite__sub_object()</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, main.o(.text), UNUSED)
 
-<P><STRONG><a name="[bf]"></a>Sprite::wallPhysics()</STRONG> (Thumb, 300 bytes, Stack size 0 bytes, main.o(.text))
+<P><STRONG><a name="[bf]"></a>Sprite::wallPhysics()</STRONG> (Thumb, 306 bytes, Stack size 0 bytes, main.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::physics()
 </UL>
 
@@ -1430,7 +1431,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::physics()
 </UL>
 
-<P><STRONG><a name="[be]"></a>Sprite::physics()</STRONG> (Thumb, 194 bytes, Stack size 104 bytes, main.o(.text))
+<P><STRONG><a name="[be]"></a>Sprite::physics()</STRONG> (Thumb, 238 bytes, Stack size 104 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144<LI>Call Chain = Sprite::physics() &rArr; Sprite::collision(Sprite, Sprite)
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy4
@@ -1440,7 +1441,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::move(int)
 </UL>
 
-<P><STRONG><a name="[c1]"></a>Sprite::logic()</STRONG> (Thumb, 266 bytes, Stack size 12 bytes, main.o(.text))
+<P><STRONG><a name="[c1]"></a>Sprite::logic()</STRONG> (Thumb, 434 bytes, Stack size 12 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = Sprite::logic() &rArr; findClosestBall(int)
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;findClosestBall(int)
@@ -1457,7 +1458,8 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[ae]"></a>Random_Init(unsigned)</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, random.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<BR><BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
+<LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[128]"></a>Random32()</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, random.o(.text), UNUSED)
@@ -1897,7 +1899,7 @@ Global Symbols
 
 <P><STRONG><a name="[138]"></a>Sprite::Sprite__sub_object(int, int, int, const unsigned char*, bool, bool)</STRONG> (Thumb, 0 bytes, Stack size 20 bytes, sprite.o(.text), UNUSED)
 
-<P><STRONG><a name="[bb]"></a>Sprite::move(int)</STRONG> (Thumb, 272 bytes, Stack size 16 bytes, sprite.o(.text))
+<P><STRONG><a name="[bb]"></a>Sprite::move(int)</STRONG> (Thumb, 284 bytes, Stack size 16 bytes, sprite.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = Sprite::move(int) &rArr; Sprite::physics() &rArr; Sprite::collision(Sprite, Sprite)
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::logic()
@@ -1937,18 +1939,18 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> powerups.o(.text)
 </UL>
-<P><STRONG><a name="[f7]"></a>expand(Sprite&, Sprite&, Sprite&, bool*, bool*)</STRONG> (Thumb, 6 bytes, Stack size 8 bytes, powerups.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = expand(Sprite&, Sprite&, Sprite&, bool*, bool*)
+<P><STRONG><a name="[f7]"></a>expand(Sprite&, Sprite&, Sprite&, bool*, bool*)</STRONG> (Thumb, 14 bytes, Stack size 12 bytes, powerups.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = expand(Sprite&, Sprite&, Sprite&, bool*, bool*)
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> powerups.o(.text)
 </UL>
-<P><STRONG><a name="[f8]"></a>shrink(Sprite&, Sprite&, Sprite&, bool*, bool*)</STRONG> (Thumb, 6 bytes, Stack size 8 bytes, powerups.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = shrink(Sprite&, Sprite&, Sprite&, bool*, bool*)
+<P><STRONG><a name="[f8]"></a>shrink(Sprite&, Sprite&, Sprite&, bool*, bool*)</STRONG> (Thumb, 14 bytes, Stack size 12 bytes, powerups.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = shrink(Sprite&, Sprite&, Sprite&, bool*, bool*)
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> powerups.o(.text)
 </UL>
-<P><STRONG><a name="[f9]"></a>maxSize(Sprite&, Sprite&, Sprite&, bool*, bool*)</STRONG> (Thumb, 6 bytes, Stack size 8 bytes, powerups.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = maxSize(Sprite&, Sprite&, Sprite&, bool*, bool*)
+<P><STRONG><a name="[f9]"></a>maxSize(Sprite&, Sprite&, Sprite&, bool*, bool*)</STRONG> (Thumb, 14 bytes, Stack size 12 bytes, powerups.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = maxSize(Sprite&, Sprite&, Sprite&, bool*, bool*)
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> powerups.o(.text)
 </UL>

@@ -137,9 +137,9 @@ bool menu = true;
 
 Sprite goodGuy(5, 31,REFLECTORH, reflector, false, false);
 Sprite gGuy_S = goodGuy;
-Sprite bouncyBall(63,31,REFLECTORH, ball, true, false);
+Sprite bouncyBall(63,31,BALLH, ball, true, false);
 Sprite bBall_S = bouncyBall;
-Sprite enemyReflector(122-6,31,BALLH, reflector, false, true);
+Sprite enemyReflector(122-6,31,REFLECTORH,reflector, false, true);
 Sprite eReflector_S = enemyReflector;
 Sprite bouncyBalls[NUMBALLS];
 Sprite bBalls_S[NUMBALLS];
@@ -495,6 +495,8 @@ void Delay100ms(uint32_t count){
 void Sprite::reset() {
 		enemyReflector.length = REFLECTORH;
 		enemyReflector.image = reflector;
+		enemyReflector.x = 122-6;
+		enemyReflector.vx = 0;
 		enemyReflector.vy = AIYSPEED;
 		enemyReflector.x = 122-6;
 		bouncyBall.ax = 0;

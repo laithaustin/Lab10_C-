@@ -684,6 +684,7 @@ void Sprite::PointScored(int who) {
 		else if (goodGuy.round == '6') {
 			//TODO: write reset requirements
 			restoreSaves();
+		}
 		else if (goodGuy.round == '7') {
 			//TODO: write reset requirements
 			for (int i = 0; i < numBalls; i++) {

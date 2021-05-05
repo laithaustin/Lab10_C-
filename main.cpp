@@ -418,7 +418,7 @@ void SysTick_Handler(void){
 				bouncyBalls[i].move(0);
 			}
 		}
-		if (goodGuy.round == '5' || goodGuy.round == '9' || goodGuy.round == ':'){
+		if (goodGuy.round == '5' || goodGuy.round == '7' || goodGuy.round == '9' || goodGuy.round == ':'){
 			for(int i = 0; i < numLasers; i++) {
 				if (lasers[i].life == alive) {
 					lasers[i].vx = -10;
@@ -497,6 +497,7 @@ void Sprite::reset() {
 		enemyReflector.length = REFLECTORH;
 		enemyReflector.image = reflector;
 		enemyReflector.vy = AIYSPEED;
+		enemyReflector.x = 122-6;
 		bouncyBall.ax = 0;
 		bouncyBall.vx = -3;
 		reverseMode = false;
@@ -511,6 +512,8 @@ void Sprite::reset() {
 				lasers[i].x = 61;
 				lasers[i].y = 31;
 		}
+		numBalls = 0;
+		numLasers = 0;
 }
 
 //call before powerupActivate so that 
@@ -592,10 +595,17 @@ void Sprite::nextRound(){
 		//TODO: Write rest of round 6 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '7') {
 			reset();
-			saveStates();
+			numBalls = 2;
+			numLasers = 1;
+			enemyReflector.vy += 2;
+            saveStates();
 			pUps.powerUpActivate();
+			Timer0_Init(PeriodicLaserHandler,80000*50*35);
+			Timer3_Init(PeriodicBallHandler,80000*50*46);
 		//TODO: Write rest of round 7 conditions, reset conditions, and point scored conditions
 	} else if (enemyReflector.round == '8') {
+			TIMER3_CTL_R = 0x00000000;
+		    TIMER0_CTL_R = 0x00000000;
 			reset();
 			saveStates();
 			pUps.powerUpActivate();
@@ -617,6 +627,8 @@ void Sprite::nextRound(){
 			Timer0_Init(PeriodicLaserHandler,80000*50*10);
 		//TODO: Write rest of round 10 conditions, reset conditions, and point scored conditions (FINAL BOSS)
 	} else if (enemyReflector.round == ';') {
+			TIMER3_CTL_R = 0x00000000;
+		  TIMER0_CTL_R = 0x00000000;
 			goodGuy.life = dead;
 			bouncyBall.score++; //don't worry about this line, it has to do with how delays are implemented each round
 	}
@@ -633,9 +645,9 @@ void Sprite::PointScored(int who) {
 			//implement losing mechanic/screen
 			goodGuy.life = dead;
 		}
-		if (goodGuy.round != '4' && goodGuy.round != '5' && goodGuy.round != '9' && goodGuy.round != ':' && goodGuy.round != '6'){
-			restoreSaves(); //restore round conditions
-			bouncyBall.x = 63;
+		if (goodGuy.round < '4'){
+            restoreSaves(); //restore round conditions
+		    bouncyBall.x = 63;
 			bouncyBall.y = 31;
 			bouncyBall.vy = 0;
 			bouncyBall.vx = 0;
@@ -669,10 +681,24 @@ void Sprite::PointScored(int who) {
 			bouncyBall.life = alive;
 			bouncyBall.vx = -6;
 		}
-		
 		else if (goodGuy.round == '6') {
 			//TODO: write reset requirements
 			restoreSaves();
+		else if (goodGuy.round == '7') {
+			//TODO: write reset requirements
+			for (int i = 0; i < numBalls; i++) {
+				bouncyBalls[i].life = dead;
+			}
+			for (int i = 0; i < numLasers; i++) {
+				lasers[i].life = dead;
+				lasers[i].x = 61;
+				lasers[i].y = -1;
+			}
+			Timer0_Init(PeriodicLaserHandler,80000*50*35);
+			Timer3_Init(PeriodicBallHandler,80000*50*46);
+		}
+		else if (goodGuy.round == '8') {
+			//TODO: write reset requirements
 			bouncyBall.x = 60;
 			bouncyBall.y = 31;
 			bouncyBall.vy = 0;
@@ -763,7 +789,7 @@ void Sprite::wallPhysics(){
 }
 
 void Sprite::physics() {
-	if (goodGuy.round != '4' && goodGuy.round != ':'){
+	if (goodGuy.round != '4' && goodGuy.round != '7' && goodGuy.round != ':'){
 		wallPhysics();
 	} else {
 		//account for ball collisions
@@ -798,7 +824,7 @@ Sprite *findClosestBall(int balls){
 
 //how the reflector makes decisions about movement
 void Sprite::logic() {
-	if (enemyReflector.round != '4' && enemyReflector.round != '6' && enemyReflector.round != ':'){
+	if (enemyReflector.round != '4' && enemyReflector.round != '6' && enemyReflector.round != '7' && enemyReflector.round != ':'){
 			if (bouncyBall.y + bouncyBall.vy < y-length/2){ //if ball is above reflector
 				y -= vy;
 				if(y-length <= 2){

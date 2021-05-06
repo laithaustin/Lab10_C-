@@ -7,6 +7,7 @@
 #include "Sprite.h"
 #include <stdint.h>
 #include "../inc/tm4c123gh6pm.h"
+#include "Sound.h"
 #define BALLSPEED -6 //1 pixel per 50 ms
 #define AIYSPEED 1 //1 pixel per 50 ms
 
@@ -32,11 +33,13 @@ void Sprite::move(int data) {
 				y += vy;
 				//edge conditions
 				if (y < 4) {
-						y = 4;
-						vy = -vy;
+					Sound_Start(bounce,606);
+					y = 4;
+					vy = -vy;
 				}
 					
 				else if (y > 62) {
+					Sound_Start(bounce,606);
 					y = 62;
 					vy = -vy;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 				}

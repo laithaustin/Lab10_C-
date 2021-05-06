@@ -135,6 +135,7 @@ int numLasers = 0;
 int cycle = 0;
 int menuPointer = 0;
 bool menu = true;
+int wins = 0;
 
 Sprite goodGuy(5, 31,REFLECTORH, reflector, false, false);
 Sprite gGuy_S = goodGuy;
@@ -147,7 +148,6 @@ Sprite bBalls_S[NUMBALLS];
 powerups pUps(goodGuy, enemyReflector, bouncyBall, &reverseMode, &noCollisionsMode);
 Sprite lasers[25];
 Sprite spikeyBalls[5];
-
 
 void SysTick_Init(unsigned long period){
 	NVIC_ST_CTRL_R = 0;
@@ -406,6 +406,9 @@ int main(void){
 	SSD1306_OutClear();
 	SSD1306_ClearBuffer();
 	SSD1306_DrawBMP(14, 27, PongScreen4, 0, SSD1306_WHITE);
+	SSD1306_DrawString(25, 45, "Rounds Won: ", SSD1306_WHITE);
+	if (wins < 10) SSD1306_DrawChar(97, 45, wins+'0', SSD1306_WHITE);
+	else if (wins == 10) SSD1306_DrawString(97, 45, "10", SSD1306_WHITE);
   SSD1306_OutBuffer();
 }
 
@@ -728,6 +731,7 @@ void Sprite::PointScored(int who) {
     if (who == 0) enemyReflector.score++;
     else if (who == 1) goodGuy.score++;
     if (goodGuy.score == '5' ||enemyReflector.score == '5' ){
+			if (goodGuy.score == '5') wins++;
 			nextRound();
 		} else if (enemyReflector.score == '5'){
 			//implement losing mechanic/screen

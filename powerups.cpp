@@ -10,55 +10,71 @@
 #include "images.h"
 
 
-void superBalls(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
-	ball.vx *= 2;
-	ball.vy *= 2;
+void superBalls(Sprite *balls,Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
+	if (ball.life == alive) ball.vx *= 2;
+	if (ball.life == alive) ball.vy *= 2;
+	for (int i = 0; i < 13; i++){
+		if (balls[i].life == alive){
+			balls[i].vx *= 2;
+			balls[i].vy *= 2;
+		}
+	}
 }
 
-void invisibleBall(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
-	ball.image = antiball;
+void invisibleBall(Sprite *balls, Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
+	if (ball.life == alive) ball.image = antiball;
+	for (int i = 0; i < 13; i++){
+		if (balls[i].life == alive){
+			balls[i].image = antiball;
+		}
+	}
 }
 
-void intangibleBall(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
-	*noColMode = true;
+void revBall(Sprite *balls,Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
+		if (ball.life == alive) ball.vx *= -1;
+		for (int i = 0; i < 13; i++){
+			if (balls[i].life == alive){
+				balls[i].vx *= -1;
+			}
+		}
 }
 
-void death(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
+void death(Sprite *balls,Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
 	reflector.life = dead; //implement premature death screen
 }
 
-void slowAI(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
+void slowAI(Sprite *balls,Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
 	enemy.vy = 1;
 }
 
-void revControls(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
+void revControls(Sprite *balls,Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
 	*revMode = true;
 }
 
-void expand(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
+void expand(Sprite *balls,Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
 	reflector.image = biggerReflector;
 	reflector.length = 22;
 }
 
-void shrink(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
+void shrink(Sprite *balls,Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
 	reflector.image = reflector_small;
 	reflector.length = 4;
 }
 
-void maxSize(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
+void maxSize(Sprite *balls,Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
 	reflector.image = reflector_huge;
 	reflector.length = 50;
 }
 
-void freezeAI(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
+void freezeAI(Sprite *balls, Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode){
 	enemy.vy = 0;
 }
 
-powerups::powerups(Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode) {
+powerups::powerups(Sprite *balls, Sprite &reflector, Sprite &enemy, Sprite &ball, bool *revMode, bool *noColMode) {
 	powerUpReady = false;
 	list[0] = *superBalls;
 	list[1] = *invisibleBall;
-	list[2] = *intangibleBall;
+	list[2] = *revBall;
 	list[3] = *death;
 	list[4] = *slowAI;
 	list[5] = *revControls;
@@ -73,7 +89,7 @@ int powerups::hash (int val){
 		return 0;
 	} else if (val >= 25 && val <= 29){ //invisible ball
 		return 1;
-	} else if (val >= 30 && val <= 34) {//intangibile ball
+	} else if (val >= 30 && val <= 34) {//shrink enemy
 		return 2;
 	} else if (val >= 35 && val <= 39) { //death
 		return 3;

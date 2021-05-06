@@ -118,7 +118,7 @@ void Delay100ms(uint32_t count); // time delay in 0.1 seconds
 
 #define REFLECTORW 4
 #define REFLECTORH 14
-#define MAXYVELOCITY 6
+#define MAXYVELOCITY 2
 #define BALLH 4
 #define BALLSPEED -6 //1 pixel per 50 ms
 #define AIYSPEED 1 //1 pixel per 50 ms
@@ -144,7 +144,7 @@ Sprite enemyReflector(122-6,31,REFLECTORH, reflector, false, true);
 Sprite eReflector_S = enemyReflector;
 Sprite bouncyBalls[NUMBALLS];
 Sprite bBalls_S[NUMBALLS];
-powerups pUps(goodGuy, enemyReflector, bouncyBall, &reverseMode, &noCollisionsMode);
+powerups pUps(bouncyBalls,goodGuy, enemyReflector, bouncyBall, &reverseMode, &noCollisionsMode);
 Sprite lasers[25];
 Sprite spikeyBalls[5];
 
@@ -401,10 +401,18 @@ int main(void){
 			Draw(goodGuy);
 		}
   }
-	SSD1306_OutClear();
-	SSD1306_ClearBuffer();
-	SSD1306_DrawBMP(14, 27, PongScreen4, 0, SSD1306_WHITE);
-  SSD1306_OutBuffer();
+	//premature death scene -> from powerup
+	if (goodGuy.round < ':'){
+		SSD1306_DrawString(8,24,"You died...",SSD1306_WHITE);
+		if (English) SSD1306_DrawString(28,24,"Even RNG is against you haha",SSD1306_WHITE);
+		else SSD1306_DrawString(34,24,"Incluso el RNG está en tu contra jaja",SSD1306_WHITE);
+	}
+	else { //end of game screen
+		SSD1306_OutClear();
+		SSD1306_ClearBuffer();
+		SSD1306_DrawBMP(14, 27, PongScreen4, 0, SSD1306_WHITE);
+		SSD1306_OutBuffer();
+	}
 }
 
 void SysTick_Handler(void){
@@ -632,13 +640,13 @@ void Sprite::nextRound(){
 			pUps.powerUpActivate(); //enable PA4 powerup interrupt
 	} else if (enemyReflector.round == '5') {
 			reset();
-			pUps.powerUpActivate();
 			for (int i = 0; i < numBalls; i++){
 				bouncyBalls[i].life = dead;
 			}
 			enemyReflector.vy += 1;
 			numLasers = 1;
 			saveStates();
+			pUps.powerUpActivate();
 			Timer0_Init(PeriodicLaserHandler,80000*50*35);
 	} else if (enemyReflector.round == '6') {
 			reset();
@@ -901,11 +909,11 @@ void Sprite::wallPhysics(){
 				vx = -vx;
 				vx -= ax;
 				if (enemyReflector.dir == up){
-					vy = enemyReflector.lasty - enemyReflector.y;
+					vy = enemyReflector.vy;
 					vy = (MAXYVELOCITY < vy) ? -MAXYVELOCITY : -vy;
 				} else if (enemyReflector.dir == down) {
-					vy = enemyReflector.y - enemyReflector.lasty;
-					vy = (MAXYVELOCITY < vy) ? MAXYVELOCITY : vy;
+					vy = enemyReflector.vy;
+					vy = (abs(MAXYVELOCITY)< abs(vy)) ? MAXYVELOCITY : vy;
 				} else {
 					vy = 0;                                                                                                                                                          
 				}
@@ -954,11 +962,13 @@ void Sprite::logic() {
 	if (enemyReflector.round != '4' && enemyReflector.round != '6' && enemyReflector.round != '7' && enemyReflector.round != ':'){
 			if (bouncyBall.y + bouncyBall.vy < y-length/2){ //if ball is above reflector
 				y -= vy;
+				enemyReflector.dir = down;
 				if(y-length <= 2){
 					y = length + 2;
 				}
 			} else if (bouncyBall.y + bouncyBall.vy - 4 > y - length/2){ //if ball is lower than reflector
 				y += vy;
+				enemyReflector.dir = up;
 				if (y >= 63){
 					y = 63;
 				}
@@ -974,11 +984,13 @@ void Sprite::logic() {
 			}
 			if (bouncyBall.y + bouncyBall.vy < y-length/2){ //if ball is above reflector
 				y -= vy;
+				enemyReflector.dir = down;
 				if(y-length <= 2){
 					y = length + 2;
 				}
 			} else if (bouncyBall.y + bouncyBall.vy - 4 > y - length/2){ //if ball is lower than reflector
 				y += vy;
+				enemyReflector.dir = up;
 				if (y >= 63){
 					y = 63;
 				}
@@ -1061,7 +1073,7 @@ int powerups::randomizer() {
 void powerups::activatePower() {
 	if (powerUpReady){
 		int index = hash(randomizer());
-		(*list[index])(goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
+		(*list[index])(bouncyBalls,goodGuy, enemyReflector, bouncyBall,&reverseMode, &noCollisionsMode);
 		powerUpReady = false;
 	}
 }

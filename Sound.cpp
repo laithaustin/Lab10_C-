@@ -41,7 +41,8 @@ void Sound_Start(const uint8_t *pt, uint32_t count){
 };
 // 11 kHz timer ISR
 void TimerISR(void) {
-	DAC_Out(sounds[counter]);
+	if (sounds == shoot) DAC_Out(sounds[counter]>>2);
+	else DAC_Out(sounds[counter]);
 	counter++;
 	if (counter >= max) TIMER2_CTL_R = 0x0;
 }

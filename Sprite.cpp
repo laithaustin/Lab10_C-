@@ -7,6 +7,7 @@
 #include "Sprite.h"
 #include <stdint.h>
 #include "../inc/tm4c123gh6pm.h"
+#include "Sound.h"
 #define BALLSPEED -6 //1 pixel per 50 ms
 #define AIYSPEED 1 //1 pixel per 50 ms
 
@@ -32,11 +33,13 @@ void Sprite::move(int data) {
 				y += vy;
 				//edge conditions
 				if (y < 4) {
-						y = 4;
-						vy = -vy;
+					Sound_Start(bounce,606);
+					y = 4;
+					vy = -vy;
 				}
 					
 				else if (y > 62) {
+					Sound_Start(bounce,606);
 					y = 62;
 					vy = -vy;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 				}
@@ -75,6 +78,7 @@ Sprite::Sprite(int x1, int y1, int l, const uint8_t* p, bool objType, bool isEne
 	 life = alive;
 	 image = p;
 	 isProjectile = objType; //check if it's a projectile
+	 isSpikeyBall = false;
 	 if (isProjectile){
 			vx = BALLSPEED; //INITIALLY WILL MOVE HORIZONTALLY
 	 }
@@ -95,6 +99,7 @@ void Sprite::operator=(Sprite &s){
 	isProjectile = s.isProjectile;
 	isEnemy = s.isEnemy;
 	life = s.life;
+	isSpikeyBall = false;
 }
 
 

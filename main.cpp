@@ -118,7 +118,7 @@ void Delay100ms(uint32_t count); // time delay in 0.1 seconds
 
 #define REFLECTORW 4
 #define REFLECTORH 14
-#define MAXYVELOCITY 2
+#define MAXYVELOCITY 6
 #define BALLH 4
 #define BALLSPEED -6 //1 pixel per 50 ms
 #define AIYSPEED 1 //1 pixel per 50 ms
@@ -405,11 +405,18 @@ int main(void){
   }
 	//premature death scene -> from powerup
 	if (goodGuy.round < ';'){
-		if (English) SSD1306_DrawString(8,24,"You died...",SSD1306_WHITE);
-		else SSD1306_DrawString(8,24,"Tu moriste...",SSD1306_WHITE);
-		if (English) SSD1306_DrawString(28,24,"Even RNG is against you haha",SSD1306_WHITE);
-		else SSD1306_DrawString(34,24,"Incluso el RNG está en tu contra jaja",SSD1306_WHITE);
-        SSD1306_OutBuffer();
+		SSD1306_ClearBuffer();
+		if (English) SSD1306_DrawString(31,24,"You died...",SSD1306_WHITE);
+		else SSD1306_DrawString(25,24,"Tu moriste...",SSD1306_WHITE);
+		if (English) {
+			SSD1306_DrawString(34,34,"Even RNG is ",SSD1306_WHITE);
+			SSD1306_DrawString(16,34,"against you haha",SSD1306_WHITE);
+		}
+		else {
+			SSD1306_DrawString(7,34,"Incluso el RNG esta",SSD1306_WHITE);
+			SSD1306_DrawString(13,34,"en tu contra jaja",SSD1306_WHITE);
+		}
+    SSD1306_OutBuffer();
 	}
 	else { //end of game screen
 	    SSD1306_OutClear();
@@ -419,7 +426,7 @@ int main(void){
 	    else SSD1306_DrawString(25, 45, "Niveles Ganados: ", SSD1306_WHITE);
 	    if (wins < 10) SSD1306_DrawChar(97, 45, wins+'0', SSD1306_WHITE);
 	    else if (wins == 10) SSD1306_DrawString(97, 45, "10", SSD1306_WHITE);
-        SSD1306_OutBuffer();
+      SSD1306_OutBuffer();
 	}
 }
 

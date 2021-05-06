@@ -974,12 +974,14 @@ void Sprite::logic() {
 				enemyReflector.dir = down;
 				if(y-length <= 2){
 					y = length + 2;
+					enemyReflector.dir = fix;
 				}
 			} else if (bouncyBall.y + bouncyBall.vy - 4 > y - length/2){ //if ball is lower than reflector
 				y += vy;
 				enemyReflector.dir = up;
 				if (y >= 63){
 					y = 63;
+					enemyReflector.dir = fix;
 				}
 			} //implement a way for AI to check player's position so it can score on them
 		} else if (enemyReflector.round == '6') {
@@ -1042,19 +1044,6 @@ void Sprite::moveLaser() {
 	}
 }
 
-void Sprite::moveSpike() {
-	if (life == dead) return;
-	x -= 2;
-	if (x <= 1) life = dead;
-	needToDraw = true;
-	if (life == dead) return;
-	if (goodGuy.y > y) y += 1;
-	else if (goodGuy.y < y) y -= 1;
-	if ((x <= goodGuy.x + REFLECTORW) && (y - 9 <= goodGuy.y) && (y > goodGuy.y - goodGuy.length)){
-		needToDraw = false;
-		enemyReflector.PointScored(0);
-	}
-}
 
 void Sprite::moveSpike() {
 	if (life == dead) return;

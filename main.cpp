@@ -340,6 +340,7 @@ void introAnimation(void) {
 	SSD1306_DrawBMP(14, 27, PongScreen4, 0, SSD1306_WHITE);
 	SSD1306_OutBuffer();
 	Delay100ms(20);
+	Sound_Start(falling,30209);
 	SSD1306_ClearBuffer();
 	SSD1306_DrawBMP(14, 27, PongScreen5, 0, SSD1306_WHITE);
 	SSD1306_OutBuffer();
@@ -360,6 +361,7 @@ void introAnimation(void) {
 	SSD1306_DrawBMP(14, 27, PongScreen9, 0, SSD1306_WHITE);
 	SSD1306_OutBuffer();
 	Delay100ms(5);
+	Sound_Start(scream,12314);
 	SSD1306_DrawString(32,34,"(Gone Wrong)",SSD1306_WHITE);
 	SSD1306_OutBuffer();
 	Delay100ms(10);
@@ -457,6 +459,7 @@ void PeriodicSpikeyBallHandler() {
 	if (spikeyBalls[spikeParse%numSpikeyBalls].life == alive) return;
 	spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
 	spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((enemyReflector.length-9)/2);
+	Sound_Start(sonar,10301);
 	spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
 	spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
 	spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
@@ -478,7 +481,7 @@ void PeriodicLaserHandler() {
 	lasers[0].isProjectile = true;
 	lasers[0].length = 2;
 	lasers[0].life = alive;
-	Sound_Start(shoot,4080);
+	Sound_Start(shoot,606);
 }
 
 uint32_t parse = 0;
@@ -497,7 +500,7 @@ void PeriodicBulletHellHandler() {
 	lasers[parse%numLasers].length = 2;
 	lasers[parse%numLasers].life = alive;
 	parse++;
-	Sound_Start(shoot,4080);
+	Sound_Start(shoot,606);
 }
 
 uint32_t ballParse = 0;
@@ -507,6 +510,7 @@ void PeriodicBallHandler() {
 	if (goodGuy.round == ':' && spikeyBalls[spikeParse%numSpikeyBalls].life == dead) {
 		spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
 		spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((enemyReflector.length-9)/2);
+		Sound_Start(sonar,10301);
 		spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
 		spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
 		spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
@@ -674,6 +678,7 @@ void Sprite::nextRound(){
 			numSpikeyBalls = 3;
 			spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
 			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((enemyReflector.length-9)/2);
+			Sound_Start(sonar,10301);
 			spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
 			spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
 			spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
@@ -694,6 +699,7 @@ void Sprite::nextRound(){
 			pUps.powerUpActivate();
 			Timer0_Init(PeriodicBulletHellHandler,80000*50*4);
 	} else if (enemyReflector.round == ':') {
+			Sound_Start(sonar,10301);
 			TIMER2_CTL_R = 0x0;
 			reset();
 //			pUps.powerUpActivate();
@@ -883,6 +889,7 @@ bool Sprite::collision(Sprite first, Sprite second){
 	int s_centerY = second.y + second.length/2;
 	
 	if (absDiff(f_centerX,s_centerX) <= first.length && absDiff(f_centerY, s_centerY) <= BALLH){
+		Sound_Start(bounce,606);
 		return true;
 	}
 	return false;
@@ -890,6 +897,7 @@ bool Sprite::collision(Sprite first, Sprite second){
 
 void Sprite::wallPhysics(){
 		if ((x+vx <= goodGuy.x + REFLECTORW) && ((y - 4 <= goodGuy.y) && (y >= goodGuy.y - goodGuy.length - 1))){
+				Sound_Start(bounce,606);
 				x = goodGuy.x + REFLECTORW;
 				vx = -vx;
 				vx += ax;
@@ -905,6 +913,7 @@ void Sprite::wallPhysics(){
 			} else if (enemyReflector.round == '6' && x >= enemyReflector.x + 2) {
 				goodGuy.PointScored(1);
 			}	else if ((x+vx >= enemyReflector.x) && ((y - 4 <= enemyReflector.y) && (y + vy >= enemyReflector.y - enemyReflector.length-2))){
+				Sound_Start(bounce,606);
 				x = enemyReflector.x - 1;
 				vx = -vx;
 				vx -= ax;
@@ -1042,6 +1051,20 @@ void Sprite::moveSpike() {
 	if (goodGuy.y > y) y += 1;
 	else if (goodGuy.y < y) y -= 1;
 	if ((x <= goodGuy.x + REFLECTORW) && (y - 9 <= goodGuy.y) && (y > goodGuy.y - goodGuy.length)){
+		needToDraw = false;
+		enemyReflector.PointScored(0);
+	}
+}
+
+void Sprite::moveSpike() {
+	if (life == dead) return;
+	x -= 2;
+	if (x <= 1) life = dead;
+	needToDraw = true;
+	if (life == dead) return;
+	if (goodGuy.y > y) y += 1;
+	else if (goodGuy.y < y) y -= 1;
+	if ((x <= goodGuy.x + REFLECTORW) && (y - 9 <= goodGuy.y) && (y > goodGuy.y - REFLECTORH)){
 		needToDraw = false;
 		enemyReflector.PointScored(0);
 	}

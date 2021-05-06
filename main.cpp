@@ -406,15 +406,15 @@ int main(void){
 	//premature death scene -> from powerup
 	if (goodGuy.round < ';'){
 		SSD1306_ClearBuffer();
-		if (English) SSD1306_DrawString(31,24,"You died...",SSD1306_WHITE);
-		else SSD1306_DrawString(25,24,"Tu moriste...",SSD1306_WHITE);
+		if (English) SSD1306_DrawString(31,14,"You died...",SSD1306_WHITE);
+		else SSD1306_DrawString(25,14,"Tu moriste...",SSD1306_WHITE);
 		if (English) {
-			SSD1306_DrawString(34,34,"Even RNG is ",SSD1306_WHITE);
-			SSD1306_DrawString(16,44,"against you haha",SSD1306_WHITE);
+			SSD1306_DrawString(34,24,"Even RNG is ",SSD1306_WHITE);
+			SSD1306_DrawString(16,34,"against you haha",SSD1306_WHITE);
 		}
 		else {
-			SSD1306_DrawString(7,34,"Incluso el RNG esta",SSD1306_WHITE);
-			SSD1306_DrawString(13,44,"en tu contra jaja",SSD1306_WHITE);
+			SSD1306_DrawString(7,24,"Incluso el RNG esta",SSD1306_WHITE);
+			SSD1306_DrawString(13,34,"en tu contra jaja",SSD1306_WHITE);
 		}
     SSD1306_OutBuffer();
 	}

@@ -50,6 +50,10 @@ void Sprite::move(int data) {
 		}
 		//enemy reflector conditions
 		else if (life == alive && data <0){
+			lasty = y;
+			//set direction
+			if (y > lasty) dir = down;
+			else if (y < lasty) dir = up;
 			//if (round == 1){
 			logic();
 			if (round == 6) 

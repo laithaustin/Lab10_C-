@@ -138,9 +138,9 @@ bool menu = true;
 
 Sprite goodGuy(5, 31,REFLECTORH, reflector, false, false);
 Sprite gGuy_S = goodGuy;
-Sprite bouncyBall(63,31,REFLECTORH, ball, true, false);
+Sprite bouncyBall(63,31,BALLH, ball, true, false);
 Sprite bBall_S = bouncyBall;
-Sprite enemyReflector(122-6,31,BALLH, reflector, false, true);
+Sprite enemyReflector(122-6,31,REFLECTORH, reflector, false, true);
 Sprite eReflector_S = enemyReflector;
 Sprite bouncyBalls[NUMBALLS];
 Sprite bBalls_S[NUMBALLS];
@@ -187,27 +187,27 @@ void Draw(Sprite &p){
 	SSD1306_DrawBMP(enemyReflector.x, enemyReflector.y, enemyReflector.image, 0, SSD1306_WHITE);
 	if (p.round == ':') { //ball force field around boss for round 10
 		if (cycle % 12 <= 2) {
-			SSD1306_DrawBMP(enemyReflector.x - 5, enemyReflector.y - REFLECTORH/2 + 1, bouncyBall.image, 0, SSD1306_WHITE);
-			SSD1306_DrawBMP(enemyReflector.x + 7, enemyReflector.y - REFLECTORH/2 + 1, bouncyBall.image, 0, SSD1306_WHITE);
-			SSD1306_DrawBMP(enemyReflector.x + 1, enemyReflector.y - REFLECTORH - 3, bouncyBall.image, 0, SSD1306_WHITE);
+			SSD1306_DrawBMP(enemyReflector.x - 5, enemyReflector.y - enemyReflector.length/2 + 1, bouncyBall.image, 0, SSD1306_WHITE);
+			SSD1306_DrawBMP(enemyReflector.x + 7, enemyReflector.y - enemyReflector.length/2 + 1, bouncyBall.image, 0, SSD1306_WHITE);
+			SSD1306_DrawBMP(enemyReflector.x + 1, enemyReflector.y - enemyReflector.length - 3, bouncyBall.image, 0, SSD1306_WHITE);
 			SSD1306_DrawBMP(enemyReflector.x + 1, enemyReflector.y + 5, bouncyBall.image, 0, SSD1306_WHITE);
 		}
 		else if (cycle % 12 <= 5 ) {
-			SSD1306_DrawBMP(enemyReflector.x - 4, enemyReflector.y - REFLECTORH + 3, bouncyBall.image, 0, SSD1306_WHITE);
+			SSD1306_DrawBMP(enemyReflector.x - 4, enemyReflector.y - enemyReflector.length + 3, bouncyBall.image, 0, SSD1306_WHITE);
 			SSD1306_DrawBMP(enemyReflector.x + 6, enemyReflector.y - 1, bouncyBall.image, 0, SSD1306_WHITE);
-			SSD1306_DrawBMP(enemyReflector.x + 3, enemyReflector.y - REFLECTORH - 2, bouncyBall.image, 0, SSD1306_WHITE);
+			SSD1306_DrawBMP(enemyReflector.x + 3, enemyReflector.y - enemyReflector.length - 2, bouncyBall.image, 0, SSD1306_WHITE);
 			SSD1306_DrawBMP(enemyReflector.x - 1, enemyReflector.y + 4, bouncyBall.image, 0, SSD1306_WHITE);
 		}
 		else if (cycle % 12 <= 8) {
-			SSD1306_DrawBMP(enemyReflector.x - 4, enemyReflector.y - REFLECTORH - 1, bouncyBall.image, 0, SSD1306_WHITE);
+			SSD1306_DrawBMP(enemyReflector.x - 4, enemyReflector.y - enemyReflector.length - 1, bouncyBall.image, 0, SSD1306_WHITE);
 			SSD1306_DrawBMP(enemyReflector.x + 5, enemyReflector.y + 4, bouncyBall.image, 0, SSD1306_WHITE);
-			SSD1306_DrawBMP(enemyReflector.x + 5, enemyReflector.y - REFLECTORH - 1, bouncyBall.image, 0, SSD1306_WHITE);
+			SSD1306_DrawBMP(enemyReflector.x + 5, enemyReflector.y - enemyReflector.length - 1, bouncyBall.image, 0, SSD1306_WHITE);
 			SSD1306_DrawBMP(enemyReflector.x - 4, enemyReflector.y + 4, bouncyBall.image, 0, SSD1306_WHITE);
 		}
 		else {
-			SSD1306_DrawBMP(enemyReflector.x - 2, enemyReflector.y - REFLECTORH - 3, bouncyBall.image, 0, SSD1306_WHITE);
+			SSD1306_DrawBMP(enemyReflector.x - 2, enemyReflector.y - enemyReflector.length - 3, bouncyBall.image, 0, SSD1306_WHITE);
 			SSD1306_DrawBMP(enemyReflector.x + 3, enemyReflector.y + 6, bouncyBall.image, 0, SSD1306_WHITE);
-			SSD1306_DrawBMP(enemyReflector.x + 6, enemyReflector.y - REFLECTORH + 3, bouncyBall.image, 0, SSD1306_WHITE);
+			SSD1306_DrawBMP(enemyReflector.x + 6, enemyReflector.y - enemyReflector.length + 3, bouncyBall.image, 0, SSD1306_WHITE);
 			SSD1306_DrawBMP(enemyReflector.x - 4, enemyReflector.y - 1, bouncyBall.image, 0, SSD1306_WHITE);
 		}
 	cycle++;
@@ -448,7 +448,7 @@ void PeriodicSpikeyBallHandler() {
 	if (!roundStarted) return;
 	if (spikeyBalls[spikeParse%numSpikeyBalls].life == alive) return;
 	spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
-	spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+	spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((enemyReflector.length-9)/2);
 	spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
 	spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
 	spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
@@ -464,7 +464,7 @@ void PeriodicLaserHandler() {
 	if (!roundStarted) return;
 	if (lasers[0].life == alive) return;
 	lasers[0].x = enemyReflector.x - 6;
-	lasers[0].y = enemyReflector.y - REFLECTORH/2;
+	lasers[0].y = enemyReflector.y - enemyReflector.length/2;
 	lasers[0].vx = -10;
 	lasers[0].isEnemy = true;
 	lasers[0].isProjectile = true;
@@ -478,7 +478,7 @@ uint32_t parse = 0;
 void PeriodicBulletHellHandler() {
 	if (!roundStarted) return;
 	int randomY = Random() %64;
-	while (randomY <= enemyReflector.y + 4 && randomY > enemyReflector.y - REFLECTORH - 4) {
+	while (randomY <= enemyReflector.y + 4 && randomY > enemyReflector.y - enemyReflector.length - 4) {
 		randomY = Random()%64;
 	}
 	lasers[parse%numLasers].x = enemyReflector.x - 6;
@@ -498,7 +498,7 @@ void PeriodicBallHandler() {
 	if (!roundStarted) return;
 	if (goodGuy.round == ':' && spikeyBalls[spikeParse%numSpikeyBalls].life == dead) {
 		spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
-		spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+		spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((enemyReflector.length-9)/2);
 		spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
 		spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
 		spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
@@ -665,7 +665,7 @@ void Sprite::nextRound(){
 			enemyReflector.vy += 2;
 			numSpikeyBalls = 3;
 			spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
-			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((enemyReflector.length-9)/2);
 			spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
 			spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
 			spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
@@ -694,7 +694,7 @@ void Sprite::nextRound(){
 			numLasers = 1;
 			numSpikeyBalls = 3;
 			spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
-			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((enemyReflector.length-9)/2);
 			spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
 			spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
 			spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
@@ -722,6 +722,7 @@ void Sprite::PointScored(int who) {
     if (who == 0) enemyReflector.score++;
     else if (who == 1) goodGuy.score++;
     if (goodGuy.score == '5' ||enemyReflector.score == '5' ){
+			restoreSaves(); 
 			nextRound();
 		} else if (enemyReflector.score == '5'){
 			//implement losing mechanic/screen
@@ -800,7 +801,7 @@ void Sprite::PointScored(int who) {
 			bouncyBall.life = alive;
 			bouncyBall.vx = -6;
 			spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
-			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((enemyReflector.length-9)/2);
 			spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
 			spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
 			spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
@@ -841,7 +842,7 @@ void Sprite::PointScored(int who) {
 				bouncyBalls[i].life = dead;
 			}
 			spikeyBalls[spikeParse%numSpikeyBalls].x = enemyReflector.x - 10;
-			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((REFLECTORH-9)/2);
+			spikeyBalls[spikeParse%numSpikeyBalls].y = enemyReflector.y - ((enemyReflector.length-9)/2);
 			spikeyBalls[spikeParse%numSpikeyBalls].vx = 1;
 			spikeyBalls[spikeParse%numSpikeyBalls].vy = 1;
 			spikeyBalls[spikeParse%numSpikeyBalls].isEnemy = false;
@@ -895,7 +896,7 @@ void Sprite::wallPhysics(){
 				}
 			} else if (enemyReflector.round == '6' && x >= enemyReflector.x + 2) {
 				goodGuy.PointScored(1);
-			}	else if ((x+vx >= enemyReflector.x) && ((y - 4 <= enemyReflector.y) && (y + vy >= enemyReflector.y - enemyReflector.length-1))){
+			}	else if ((x+vx >= enemyReflector.x) && ((y - 4 <= enemyReflector.y) && (y + vy >= enemyReflector.y - enemyReflector.length-2))){
 				x = enemyReflector.x - 1;
 				vx = -vx;
 				vx -= ax;
@@ -1014,7 +1015,7 @@ void Sprite::moveLaser() {
 			life = dead;
 		}
 	}
-	if ((x <= goodGuy.x + REFLECTORW) && (y <= goodGuy.y) && (y > goodGuy.y - REFLECTORH) && life == alive){
+	if ((x <= goodGuy.x + REFLECTORW) && (y <= goodGuy.y) && (y > goodGuy.y - goodGuy.length) && life == alive){
 		needToDraw = false;
 		enemyReflector.PointScored(0);
 	}
@@ -1028,7 +1029,7 @@ void Sprite::moveSpike() {
 	if (life == dead) return;
 	if (goodGuy.y > y) y += 1;
 	else if (goodGuy.y < y) y -= 1;
-	if ((x <= goodGuy.x + REFLECTORW) && (y - 9 <= goodGuy.y) && (y > goodGuy.y - REFLECTORH)){
+	if ((x <= goodGuy.x + REFLECTORW) && (y - 9 <= goodGuy.y) && (y > goodGuy.y - goodGuy.length)){
 		needToDraw = false;
 		enemyReflector.PointScored(0);
 	}

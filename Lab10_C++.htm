@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Lab10_C++.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Lab10_C++.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu May 06 00:45:57 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu May 06 00:55:59 2021
 <BR><P>
 <H3>Maximum Stack Usage =        192 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1270,7 +1270,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[92]"></a>main</STRONG> (Thumb, 662 bytes, Stack size 16 bytes, main.o(.text))
+<P><STRONG><a name="[92]"></a>main</STRONG> (Thumb, 740 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = main &rArr; Draw(Sprite&) &rArr; SSD1306_DrawString(short, short, char*, unsigned short) &rArr; SSD1306_DrawChar(short, short, char, unsigned short) &rArr; SSD1306_DrawPixel(short, short, unsigned short)
 </UL>
 <BR>[Calls]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init()
@@ -1303,7 +1303,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> main.o(.text)
 </UL>
-<P><STRONG><a name="[84]"></a>PeriodicBallHandler()</STRONG> (Thumb, 1094 bytes, Stack size 8 bytes, main.o(.text))
+<P><STRONG><a name="[84]"></a>PeriodicBallHandler()</STRONG> (Thumb, 1118 bytes, Stack size 8 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = PeriodicBallHandler()
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Random()
@@ -1329,7 +1329,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> main.o(.text)
 </UL>
-<P><STRONG><a name="[b5]"></a>Sprite::reset()</STRONG> (Thumb, 398 bytes, Stack size 16 bytes, main.o(.text))
+<P><STRONG><a name="[b5]"></a>Sprite::reset()</STRONG> (Thumb, 394 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = Sprite::reset()
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Random()
@@ -1361,7 +1361,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::nextRound()
 </UL>
 
-<P><STRONG><a name="[ba]"></a>Sprite::nextRound()</STRONG> (Thumb, 1602 bytes, Stack size 16 bytes, main.o(.text))
+<P><STRONG><a name="[ba]"></a>Sprite::nextRound()</STRONG> (Thumb, 1672 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = Sprite::nextRound() &rArr; Sprite::reset()
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Random()
@@ -1375,7 +1375,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::PointScored(int)
 </UL>
 
-<P><STRONG><a name="[bd]"></a>Sprite::PointScored(int)</STRONG> (Thumb, 1840 bytes, Stack size 16 bytes, main.o(.text))
+<P><STRONG><a name="[bd]"></a>Sprite::PointScored(int)</STRONG> (Thumb, 1764 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = Sprite::PointScored(int) &rArr; Sprite::nextRound() &rArr; Sprite::reset()
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Random()
@@ -1406,7 +1406,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
 </UL>
 
-<P><STRONG><a name="[15]"></a>SysTick_Handler</STRONG> (Thumb, 420 bytes, Stack size 16 bytes, main.o(.text))
+<P><STRONG><a name="[15]"></a>SysTick_Handler</STRONG> (Thumb, 424 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 192<LI>Call Chain = SysTick_Handler &rArr; Sprite::move(int) &rArr; Sprite::physics() &rArr; Sprite::wallPhysics() &rArr; Sprite::PointScored(int) &rArr; Sprite::nextRound() &rArr; Sprite::reset()
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::move(int)
@@ -1469,7 +1469,7 @@ Global Symbols
 </UL>
 <P><STRONG><a name="[12e]"></a>Sprite::Sprite__sub_object()</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, main.o(.text), UNUSED)
 
-<P><STRONG><a name="[c3]"></a>Sprite::wallPhysics()</STRONG> (Thumb, 360 bytes, Stack size 8 bytes, main.o(.text))
+<P><STRONG><a name="[c3]"></a>Sprite::wallPhysics()</STRONG> (Thumb, 426 bytes, Stack size 8 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = Sprite::wallPhysics() &rArr; Sprite::PointScored(int) &rArr; Sprite::nextRound() &rArr; Sprite::reset()
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sound_Start(const unsigned char*, unsigned)
@@ -1479,7 +1479,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sprite::physics()
 </UL>
 
-<P><STRONG><a name="[c5]"></a>Sprite::collision(Sprite, Sprite)</STRONG> (Thumb, 152 bytes, Stack size 40 bytes, main.o(.text))
+<P><STRONG><a name="[c5]"></a>Sprite::collision(Sprite, Sprite)</STRONG> (Thumb, 90 bytes, Stack size 40 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = Sprite::collision(Sprite, Sprite)
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Sound_Start(const unsigned char*, unsigned)
@@ -2127,7 +2127,7 @@ Global Symbols
 <H3>
 Local Symbols
 </H3>
-<P><STRONG><a name="[85]"></a>__sti___8_main_cpp_b81b5551</STRONG> (Thumb, 184 bytes, Stack size 16 bytes, main.o(.text))
+<P><STRONG><a name="[85]"></a>__sti___8_main_cpp_b81b5551</STRONG> (Thumb, 246 bytes, Stack size 16 bytes, main.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = __sti___8_main_cpp_b81b5551 &rArr; __aeabi_vec_ctor_nocookie_nodtor
 </UL>
 <BR>[Calls]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_vec_ctor_nocookie_nodtor

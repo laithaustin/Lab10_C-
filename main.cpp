@@ -422,10 +422,22 @@ int main(void){
 	    SSD1306_OutClear();
 	    SSD1306_ClearBuffer();
 	    SSD1306_DrawBMP(14, 27, PongScreen4, 0, SSD1306_WHITE);
-	    if (English) SSD1306_DrawString(40, 40, "YOU WIN!", SSD1306_WHITE);
-			else SSD1306_DrawString(40, 40, "TU GANAS", SSD1306_WHITE);
-	    if (English) SSD1306_DrawString(25, 50, "Rounds Won: ", SSD1306_WHITE);
-	    else SSD1306_DrawString(25, 50, "Niveles Ganados: ", SSD1306_WHITE);
+	    if (English && wins > 5) {
+				SSD1306_DrawString(40, 40, "YOU WIN!", SSD1306_WHITE);
+				SSD1306_DrawString(25, 50, "Rounds Won: ", SSD1306_WHITE);
+			}
+			else if (English) {
+				SSD1306_DrawString(40, 40, "YOU LOSE", SSD1306_WHITE);
+				SSD1306_DrawString(25, 50, "Rounds Won: ", SSD1306_WHITE);
+			}
+			else if (!English && wins > 5) {
+				SSD1306_DrawString(40, 40, "TU GANAS", SSD1306_WHITE);
+				SSD1306_DrawString(25, 50, "Niveles Ganados: ", SSD1306_WHITE);
+			}
+			else if (!English) {
+				SSD1306_DrawString(34, 40, "TU PIERDES", SSD1306_WHITE);
+				SSD1306_DrawString(25, 50, "Niveles Ganados: ", SSD1306_WHITE);
+			}
 	    if (wins < 10) SSD1306_DrawChar(97, 50, wins+'0', SSD1306_WHITE);
 	    else if (wins == 10) SSD1306_DrawString(97, 50, "10", SSD1306_WHITE);
       SSD1306_OutBuffer();
